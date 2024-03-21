@@ -70,8 +70,8 @@ def wierd_function(rnd) -> int:
 
 
 def game(top_team, bottom_team) -> str:
-    print(top_team)
-    print(bottom_team)
+    # print(top_team)
+    # print(bottom_team)
     a_df = pandas.read_csv('analysis.csv')
     melo_top = a_df[a_df['TEAM'] == top_team]['MELO'].iloc[0]
     melo_bottom = a_df[a_df['TEAM'] == bottom_team]['MELO'].iloc[0]
@@ -107,9 +107,9 @@ def simulate_mm() -> pandas.DataFrame:
     rnd = 1
 
     while rnd < 5:
-        print(f"ROUND: {rnd}")
+        # print(f"ROUND: {rnd}")
         for region in regions:
-            print(f"REGION: {region}")
+            # print(f"REGION: {region}")
             range_to_search = wierd_function(rnd)
             games_to_play = amount_of_games(rnd)
             cur_pos = 0
@@ -175,7 +175,7 @@ def simulate_mm() -> pandas.DataFrame:
     order = tourney_df[tourney_df['TEAM_NAME'] == champion]['ORDER_IN_REGION'].iloc[0]
     region = dataDownLoad.get_region(champion)
 
-    row_to_add = {'TEAM_NAME': winner_sm, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
+    row_to_add = {'TEAM_NAME': champion, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
     tourney_df = tourney_df._append(row_to_add, ignore_index=True)
