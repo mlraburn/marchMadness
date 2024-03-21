@@ -93,8 +93,10 @@ def game(top_team, bottom_team) -> str:
 def find_team_in_order_range(rnd, region, upper, lower, df: pandas.DataFrame) -> str:
     team_name = ""
     while lower != upper + 1:
-        if not df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)]['TEAM_NAME'].empty:
-            return df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)]['TEAM_NAME'].iloc[0]
+        if not df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)][
+            'TEAM_NAME'].empty:
+            return \
+            df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)]['TEAM_NAME'].iloc[0]
         lower = lower + 1
     return team_name
 
@@ -116,17 +118,19 @@ def simulate_mm() -> pandas.DataFrame:
                 bottom_team = ""
                 if range_to_search == 1:
                     top_team = \
-                    tourney_df[(tourney_df['REGION'] == region) & (tourney_df['ORDER_IN_REGION'] == cur_pos)][
-                        'TEAM_NAME'].iloc[0]
+                        tourney_df[(tourney_df['REGION'] == region) & (tourney_df['ORDER_IN_REGION'] == cur_pos)][
+                            'TEAM_NAME'].iloc[0]
                     cur_pos = cur_pos + 1
                     bottom_team = \
-                    tourney_df[(tourney_df['REGION'] == region) & (tourney_df['ORDER_IN_REGION'] == cur_pos)][
-                        'TEAM_NAME'].iloc[0]
+                        tourney_df[(tourney_df['REGION'] == region) & (tourney_df['ORDER_IN_REGION'] == cur_pos)][
+                            'TEAM_NAME'].iloc[0]
+                    cur_pos = cur_pos + 1
                 else:
                     top_team = find_team_in_order_range(rnd, region, cur_pos + range_to_search - 1, cur_pos, tourney_df)
                     cur_pos = cur_pos + range_to_search
                     bottom_team = find_team_in_order_range(rnd, region, cur_pos + range_to_search - 1, cur_pos,
                                                            tourney_df)
+                    cur_pos = cur_pos + range_to_search
 
                 winning_team = game(top_team, bottom_team)
                 seed = dataDownLoad.get_seed(winning_team)
@@ -135,8 +139,7 @@ def simulate_mm() -> pandas.DataFrame:
                 row_to_add = {'TEAM_NAME': winning_team, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                               'ROUND': rnd + 1}
 
-                tourney_df = tourney_df._append(row_to_add,ignore_index=True)
-                cur_pos = cur_pos + 1
+                tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
         rnd = rnd + 1
 
@@ -151,7 +154,7 @@ def simulate_mm() -> pandas.DataFrame:
     row_to_add = {'TEAM_NAME': winner_ew, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
-    tourney_df = tourney_df._append(row_to_add,ignore_index=True)
+    tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
     south_winner = find_team_in_order_range(5, 'SOUTH', 15, 0, tourney_df)
     midwest_winner = find_team_in_order_range(5, 'MIDWEST', 15, 0, tourney_df)
@@ -163,11 +166,11 @@ def simulate_mm() -> pandas.DataFrame:
     row_to_add = {'TEAM_NAME': winner_sm, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
-    tourney_df = tourney_df._append(row_to_add,ignore_index=True)
+    tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
     rnd = rnd + 1
 
-    champion = game(winner_ew,winner_sm)
+    champion = game(winner_ew, winner_sm)
     seed = dataDownLoad.get_seed(champion)
     order = tourney_df[tourney_df['TEAM_NAME'] == champion]['ORDER_IN_REGION'].iloc[0]
     region = dataDownLoad.get_region(champion)
@@ -175,7 +178,7 @@ def simulate_mm() -> pandas.DataFrame:
     row_to_add = {'TEAM_NAME': winner_sm, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
-    tourney_df = tourney_df._append(row_to_add,ignore_index=True)
+    tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
     return tourney_df
 
