@@ -1,5 +1,6 @@
 import pandas
 import math
+import bracket
 
 sd_raw = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")
 sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
@@ -156,21 +157,31 @@ def main():
         # minimum is -4 + (2/3.0)
         # adjust by adding the above min
         win_loss_sos = (wins - losses) / sos
-        win_loss_sos = abs(win_loss_sos + 4 + (2/3))
+        win_loss_sos = abs(win_loss_sos + 4 + (2 / 3))
         win_loss_sos = win_loss_sos.__round__(1) + 1
         sos_dict['WINDIFSOS'].append(win_loss_sos)
         perf = get_reg_s_perf(team) + 1
         sos_dict['SCH_PERF'].append(perf)
         ns_grade = get_nate_silver_grade(team)
         sos_dict['NSGRADE'].append(ns_grade)
-        melo = win_loss_sos*perf*ns_grade + 1
-        sos_dict['MELO'].append((math.log(melo)*100).__round__(0))
+        melo = win_loss_sos * perf * ns_grade + 1
+        sos_dict['MELO'].append((math.log(melo) * 100).__round__(0))
 
     sos_df = pandas.DataFrame(sos_dict)
 
-    sorted_sos = sos_df.sort_values('MELO',ascending=False)
+    sorted_sos = sos_df.sort_values('MELO', ascending=False)
+    sos_df.to_csv('analysis.csv')
 
     print(sorted_sos.to_string())
+
+    print(bracket.elo_prob(1148, 1037))
+
+    # bracket.visualize_ncaab_bracket('marchMadTable.csv')
+    # print(bracket.line_to_round(12,16))
+    # print(bracket.get_upper_bound(23,3))
+
+    # name = bracket.find_team_name_in_csv(1, 15, 15, 'SOUTH', 'marchMadTable.csv')
+    # print(name)
 
 
 if __name__ == '__main__':

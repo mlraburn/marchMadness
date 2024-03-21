@@ -1,68 +1,65 @@
-TEAM_NAME,SEED,REGION,ORDER_IN_REGION
-UConn Huskies,1,EAST,0
-Stetson Hatters,16,EAST,1
-Florida Atlantic Owls,8,EAST,2
-Northwestern State Demons,9,EAST,3
-San Diego State Aztecs,5,EAST,4
-UAB Blazers,12,EAST,5
-Auburn Tigers,4,EAST,6
-Yale Bulldogs,13,EAST,7
-BYU Cougars,6,EAST,8
-Duquesne Dukes,11,EAST,9
-Illinois Fighting Illini,3,EAST,10
-Morehead State Eagles,14,EAST,11
-Washington State Cougars,7,EAST,12
-Drake Bulldogs,10,EAST,13
-Iowa State Cyclones,2,EAST,14
-South Dakota State Jackrabbits,15,EAST,15
-North Carolina Tar Heels,1,WEST,0
-Howard Bison,16,WEST,1
-Mississippi State Bulldogs,8,WEST,2
-Michigan State Spartans,9,WEST,3
-Saint Mary's Gaels,5,WEST,4
-Grand Canyon Lopes,12,WEST,5
-Alabama Crimson Tide,4,WEST,6
-Charleston Cougars,13,WEST,7
-Clemson Tigers,6,WEST,8
-New Mexico Lobos,11,WEST,9
-Baylor Bears,3,WEST,10
-Colgate Raiders,14,WEST,11
-Dayton Flyers,7,WEST,12
-Nevada Wolf Pack,10,WEST,13
-Arizona Wildcats,2,WEST,14
-Long Beach State Beach,15,WEST,15
-Houston Cougars,1,SOUTH,0
-Longwood Lancers,15,SOUTH,1
-Nebraska Cornhuskers,8,SOUTH,2
-Texas A&M Aggies,9,SOUTH,3
-Wisconsin Badgers,5,SOUTH,4
-James Madison Dukes,12,SOUTH,5
-Duke Blue Devils,4,SOUTH,6
-Vermont Catamounts,13,SOUTH,7
-Texas Tech Red Raiders,6,SOUTH,8
-NC State Wolfpack,11,SOUTH,9
-Kentucky Wildcats,3,SOUTH,10
-Oakland Golden Grizzlies,14,SOUTH,11
-Florida Gators,7,SOUTH,12
-Colorado Buffaloes,10,SOUTH,13
-Marquette Golden Eagles,2,SOUTH,14
-Western Kentucky Hilltoppers,15,SOUTH,15
-Purdue Boilermakers,1,MIDWEST,0
-Grambling Tigers,16,MIDWEST,1
-Utah State Aggies,8,MIDWEST,2
-TCU Horned Frogs,9,MIDWEST,3
-Gonzaga Bulldogs,5,MIDWEST,4
-McNeese Cowboys,12,MIDWEST,5
-Kansas Jayhawks,4,MIDWEST,6
-Samford Bulldogs,13,MIDWEST,7
-South Carolina Gamecocks,6,MIDWEST,8
-Oregon Ducks,11,MIDWEST,9
-Creighton Bluejays,3,MIDWEST,10
-Akron Zips,14,MIDWEST,11
-Texas Longhorns,7,MIDWEST,12
-Colorado State Rams,10,MIDWEST,13
-Tennessee Volunteers,2,MIDWEST,14
-Saint Peter's Peacocks,15,MIDWEST,15
-
-
-
+TEAM_NAME,SEED,REGION,ORDER_IN_REGION,ROUND
+UConn Huskies,1,EAST,0,1
+Stetson Hatters,16,EAST,1,1
+Florida Atlantic Owls,8,EAST,2,1
+Northwestern Wildcats,9,EAST,3,1
+San Diego State Aztecs,5,EAST,4,1
+UAB Blazers,12,EAST,5,1
+Auburn Tigers,4,EAST,6,1
+Yale Bulldogs,13,EAST,7,1
+BYU Cougars,6,EAST,8,1
+Duquesne Dukes,11,EAST,9,1
+Illinois Fighting Illini,3,EAST,10,1
+Morehead State Eagles,14,EAST,11,1
+Washington State Cougars,7,EAST,12,1
+Drake Bulldogs,10,EAST,13,1
+Iowa State Cyclones,2,EAST,14,1
+South Dakota State Jackrabbits,15,EAST,15,1
+North Carolina Tar Heels,1,WEST,0,1
+Howard Bison,16,WEST,1,1
+Mississippi State Bulldogs,8,WEST,2,1
+Michigan State Spartans,9,WEST,3,1
+Saint Mary's Gaels,5,WEST,4,1
+Grand Canyon Lopes,12,WEST,5,1
+Alabama Crimson Tide,4,WEST,6,1
+Charleston Cougars,13,WEST,7,1
+Clemson Tigers,6,WEST,8,1
+New Mexico Lobos,11,WEST,9,1
+Baylor Bears,3,WEST,10,1
+Colgate Raiders,14,WEST,11,1
+Dayton Flyers,7,WEST,12,1
+Nevada Wolf Pack,10,WEST,13,1
+Arizona Wildcats,2,WEST,14,1
+Long Beach State Beach,15,WEST,15,1
+Houston Cougars,1,SOUTH,0,1
+Longwood Lancers,16,SOUTH,1,1
+Nebraska Cornhuskers,8,SOUTH,2,1
+Texas A&M Aggies,9,SOUTH,3,1
+Wisconsin Badgers,5,SOUTH,4,1
+James Madison Dukes,12,SOUTH,5,1
+Duke Blue Devils,4,SOUTH,6,1
+Vermont Catamounts,13,SOUTH,7,1
+Texas Tech Red Raiders,6,SOUTH,8,1
+NC State Wolfpack,11,SOUTH,9,1
+Kentucky Wildcats,3,SOUTH,10,1
+Oakland Golden Grizzlies,14,SOUTH,11,1
+Florida Gators,7,SOUTH,12,1
+Colorado Buffaloes,10,SOUTH,13,1
+Marquette Golden Eagles,2,SOUTH,14,1
+Western Kentucky Hilltoppers,15,SOUTH,15,1
+Purdue Boilermakers,1,MIDWEST,0,1
+Grambling Tigers,16,MIDWEST,1,1
+Utah State Aggies,8,MIDWEST,2,1
+TCU Horned Frogs,9,MIDWEST,3,1
+Gonzaga Bulldogs,5,MIDWEST,4,1
+McNeese Cowboys,12,MIDWEST,5,1
+Kansas Jayhawks,4,MIDWEST,6,1
+Samford Bulldogs,13,MIDWEST,7,1
+South Carolina Gamecocks,6,MIDWEST,8,1
+Oregon Ducks,11,MIDWEST,9,1
+Creighton Bluejays,3,MIDWEST,10,1
+Akron Zips,14,MIDWEST,11,1
+Texas Longhorns,7,MIDWEST,12,1
+Colorado State Rams,10,MIDWEST,13,1
+Tennessee Volunteers,2,MIDWEST,14,1
+Saint Peter's Peacocks,15,MIDWEST,15,1
