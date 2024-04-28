@@ -68,13 +68,13 @@ def visualize_ncaab_bracket(path: str) -> None:
         south_winner_7 = find_teams_in_rounds_in_csv(7, 15, 0, regions[2], path)
         midwest_winner_7 = find_teams_in_rounds_in_csv(7, 15, 0, regions[3], path)
 
-        if east_winner_7 != "________":
+        if east_winner_7[0] != "________":
             print(f"{east_winner_7[0]} {east_winner_7[1]}")
-        elif west_winner_7 != "________":
+        elif west_winner_7[0] != "________":
             print(f"{west_winner_7[0]} {west_winner_7[1]}")
-        elif south_winner_7 != "________":
+        elif south_winner_7[0] != "________":
             print(f"{south_winner_7[0]} {south_winner_7[1]}")
-        elif midwest_winner_7 != "________":
+        elif midwest_winner_7[0] != "________":
             print(f"{midwest_winner_7[0]} {midwest_winner_7[1]}")
         else:
             print(f"{east_winner_7[0]} {east_winner_7[1]}")
