@@ -1,5 +1,4 @@
 import random
-
 import pandas
 import math
 import dataDownLoad
@@ -196,6 +195,7 @@ def main():
         print("S: Score")
         print("M: Make Brackets")
         print("P: Print Bracket")
+        print("A: Print Analysis")
         i = input(":")
         if i == 'Q':
             exit(0)
@@ -223,6 +223,9 @@ def main():
         elif i == 'P':
             path = input("path:")
             bracket.visualize_ncaab_bracket(path)
+        elif i == "A":
+            a_df.sort_values(by='MELO', ascending=False)
+            print(a_df.to_string(index=False))
 
 
 def amount_of_games(rnd) -> int:
