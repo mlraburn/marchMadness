@@ -1,14 +1,31 @@
-from typing import Tuple, Any
+"""
+Initializing File
 
-import pandas
-import math
-import bracket
+This file creates the analysis of the schedule and generates the ELO values that each team will have to determine
+their success throughout the simulated bracket
 
-sd_raw = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")  # file is downloaded from ???
-sd = sd_raw[['GAME-ID', 'TEAM', 'F']]  # filter these columns in the excel file
+"""
+import pandas   # pip install pandas
+import math     # base python
+import bracket  # custom package with bracket functions
 
-td = pandas.read_csv('marchMadTable.csv')  # load the marchMadness table which has initial values of the tourney
-nsd = pandas.read_csv('NSData.csv')  # load Nate Silvers Data
+# FILE WIDE VARIABLES
+# -------------------
+
+# Schedule information
+schedule_dataframe_raw: pandas.DataFrame = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")  # file is downloaded from ???
+schedule_dataframe: pandas.DataFrame = schedule_dataframe_raw[['GAME-ID', 'TEAM', 'F']]  # filter these columns in the excel file
+# GAME-ID: unique integer for each game.  A game consists of 2 rows one for each team in the game but with the same
+# GAME-ID.
+# TEAM: team name as string
+# F: points scored as an integer
+
+# load the marchMadness table which has initial values of the tourney
+# marchMadness table is set manually
+tournament_dataframe: pandas.DataFrame = pandas.read_csv('marchMadTable.csv')
+
+# load Nate Silvers Data
+nate_silver_data: pandas.DataFrame = pandas.read_csv('NSData.csv')
 
 
 def get_game(game_id: int) -> pandas.DataFrame:
@@ -17,7 +34,7 @@ def get_game(game_id: int) -> pandas.DataFrame:
     :param game_id: each game gets a unique ID
     :return: the row for the game
     """
-    game = sd[sd['GAME-ID'] == game_id]
+    game = schedule_dataframe[schedule_dataframe['GAME-ID'] == game_id]
     return game
 
 
@@ -28,7 +45,7 @@ def get_games(team: str) -> pandas.DataFrame:
     :return: dataframe of games
     """
     game_ids = get_games_as_id_list(team)  # get games ids as a list
-    games = sd[sd['GAME-ID'].isin(game_ids)]  # get rows based on ids
+    games = schedule_dataframe[schedule_dataframe['GAME-ID'].isin(game_ids)]  # get rows based on ids
     return games
 
 
@@ -62,7 +79,7 @@ def get_games_as_id_list(team: str) -> list[int]:
     :param team: team name
     :return: game ID list
     """
-    games = sd[sd['TEAM'] == team]
+    games = schedule_dataframe[schedule_dataframe['TEAM'] == team]
     return games['GAME-ID'].tolist()
 
 
@@ -106,24 +123,30 @@ def get_record(team: str) -> tuple[int, int]:
 def sched_dif(team: str) -> float:
     """
     Returns the difficulty of schedule
-    This is a Matt R. algorithm for this that takes into account the final seed value of the teams they play
+
+    This is a Matt R. algorithm for this that takes into account the final seed value of the teams they played
     The more seeded teams a team plays and the higher their seeds the lower the value will be approaching 0
+
+    ** NOTE ** this assumes the first four have already played their game and we know who advanced.
+
     :param team: team name
-    :return: Difficuly of schedule 0 means tougher
+    :return: Float indicating difficulty of schedule. 0 means tougher
     """
-    game_id_list = get_games_as_id_list(team)  # get games
+
+    game_id_list: list[int] = get_games_as_id_list(team)  # get games the team played in as game-id's
 
     dif = 0  # tracks the difficulty of the opponents based on seed (golf rules)
     top_64 = 0  # tracks how many top 64 seeds they played
+
     for game_id in game_id_list:  # loop through games
         o_as_rec = get_opponent_as_record(team, game_id)  # get opponent
         opponent = o_as_rec.iloc[0]['TEAM']  # actually gets the string rather than a data frame of the opponent
 
         # Check to see if the opponent is in the top 64
-        if opponent in td['TEAM_NAME'].tolist():
+        if opponent in tournament_dataframe['TEAM_NAME'].tolist():
             top_64 = top_64 + 1
-            opp_info = td[td['TEAM_NAME'] == opponent]
-            opp_dif = td[td['TEAM_NAME'] == opponent]['SEED'].iloc[0]  # get opponents seed
+            opp_info = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]
+            opp_dif = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]['SEED'].iloc[0]  # get opponents seed
             dif = dif + opp_dif  # add up the difficulty
 
     # special case if the team never plays a top 64
@@ -150,7 +173,7 @@ def get_seed(team: str) -> int:
     :param team: team name
     :return: seed
     """
-    return td[td['TEAM_NAME'] == team]['SEED'].iloc[0]
+    return tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]
 
 
 def get_reg_s_perf(team: str) -> int:
@@ -171,7 +194,7 @@ def get_reg_s_perf(team: str) -> int:
         opponent = o_as_rec.iloc[0]['TEAM']  # silly code that acctually gets their string rather than a dataframe
 
         # if the opponent is in the top 64
-        if opponent in td['TEAM_NAME'].tolist():
+        if opponent in tournament_dataframe['TEAM_NAME'].tolist():
             seed = get_seed(opponent)  # get their seed
             win_or_lose = did_win(team, game_id)  # check to see if they win
             if win_or_lose:
@@ -190,7 +213,7 @@ def get_region(team: str) -> str:
     :param team: team name
     :return: region
     """
-    region = td[td['TEAM_NAME'] == team]['REGION'].iloc[0]
+    region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
     return region
 
 
@@ -217,45 +240,71 @@ def get_nate_silver_grade(team: str) -> float:
     region = get_region(team)
     region = all_caps_to_capital_first(region)  # Nate's region is a bit different
 
-    return nsd[(nsd['SEED'] == seed) & (nsd['REGION'] == region)]['NSGRADE'].iloc[0]
+    return nate_silver_data[(nate_silver_data['SEED'] == seed) & (nate_silver_data['REGION'] == region)]['NSGRADE'].iloc[0]
 
 
 def main():
-    t_list = td['TEAM_NAME'].tolist()
+    """
+    Main Initializing function
 
-    sos_dict = {'TEAM': [], 'SEED': [], 'WINS': [], 'LOSSES': [], 'SOS': [], 'REGION': [], 'ORDER': [], 'WINDIFSOS': [],
-                'SCH_PERF': [], 'NSGRADE': [], 'MELO': []}
+    Creates the analysis.csv file which contains the ELO values for all the teams which determines their success
+    during the simulated tournament
 
-    for team in t_list:
+    It also prints out the values of the CSV file in the end
+
+    :return:
+    """
+
+    # get list of teams
+    team_list: list[str] = tournament_dataframe['TEAM_NAME'].tolist()
+
+    # declare the analysis dictionary
+    analysis_dictionary = {'TEAM': [], 'SEED': [], 'WINS': [], 'LOSSES': [], 'SOS': [], 'REGION': [], 'ORDER': [],
+                                 'WINDIFSOS': [], 'SCH_PERF': [], 'NSGRADE': [], 'MELO': []}
+
+    # TEAM: name of team as                 str
+    # SEED: seed given to team              int
+    # WINS: wins during regular season      int
+    # LOSSES: losses during regular season  int
+    # SOS: strength of schedule (my calc)   float   Most close to 0. The closest to 0 the harder the schedule
+    # REGION: region in tourney             str
+    # ORDER: order in region                int     This is a visual order and indicates who is playing who in regions
+    # WINDIFSOS: ??????????????             float   ????????
+    # SHC_PERF: schedule performance        int     How good a team did during their schedule. ?????
+    # NSGRADE: Nate Silver Score            float   0-100. The closer to 100 the better.
+    # MELO: Matt's ELO                      int     Higher the better. Combination of NSGRADE, WINDIFSOS and SCH_PERF
+
+    # Loop Calculates the values for each team
+    for team in team_list:
         sos = sched_dif(team)
-        sos_dict['TEAM'].append(team)
-        seed = td[td['TEAM_NAME'] == team]['SEED'].iloc[0]
+        analysis_dictionary['TEAM'].append(team)
+        seed = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]
         win_loss = get_record(team)
         wins = win_loss[0]
         losses = win_loss[1]
-        sos_dict['SEED'].append(seed)
-        sos_dict['WINS'].append(wins)
-        sos_dict['LOSSES'].append(losses)
-        sos_dict['SOS'].append(sos)
-        region = td[td['TEAM_NAME'] == team]['REGION'].iloc[0]
-        sos_dict['REGION'].append(region)
-        order = td[td['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
-        sos_dict['ORDER'].append(order)
+        analysis_dictionary['SEED'].append(seed)
+        analysis_dictionary['WINS'].append(wins)
+        analysis_dictionary['LOSSES'].append(losses)
+        analysis_dictionary['SOS'].append(sos)
+        region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
+        analysis_dictionary['REGION'].append(region)
+        order = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
+        analysis_dictionary['ORDER'].append(order)
 
         # minimum is -4 + (2/3.0)
         # adjust by adding the above min
         win_loss_sos = (wins - losses) / sos
         win_loss_sos = abs(win_loss_sos + 4 + (2 / 3))
         win_loss_sos = win_loss_sos.__round__(1) + 1
-        sos_dict['WINDIFSOS'].append(win_loss_sos)
+        analysis_dictionary['WINDIFSOS'].append(win_loss_sos)
         perf = get_reg_s_perf(team) + 1
-        sos_dict['SCH_PERF'].append(perf)
+        analysis_dictionary['SCH_PERF'].append(perf)
         ns_grade = get_nate_silver_grade(team)
-        sos_dict['NSGRADE'].append(ns_grade)
+        analysis_dictionary['NSGRADE'].append(ns_grade)
         melo = win_loss_sos * perf * ns_grade + 1
-        sos_dict['MELO'].append((math.log(melo) * 100).__round__(0))
+        analysis_dictionary['MELO'].append((math.log(melo) * 100).__round__(0))
 
-    sos_df = pandas.DataFrame(sos_dict)
+    sos_df = pandas.DataFrame(analysis_dictionary)
 
     sorted_sos = sos_df.sort_values('MELO', ascending=False)
     sos_df.to_csv('analysis.csv')
