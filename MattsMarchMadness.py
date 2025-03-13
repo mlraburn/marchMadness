@@ -32,7 +32,7 @@ def create_analysis_df() -> pandas.DataFrame:
         analysis_dict['WINS'].append(wins)
         analysis_dict['LOSSES'].append(losses)
 
-        sos = dataDownLoad.sched_dif(team)
+        sos = dataDownLoad.strength_of_schedule_calculator(team)
         analysis_dict['SOS'].append(sos)
 
         region = td[td['TEAM_NAME'] == team]['REGION'].iloc[0]

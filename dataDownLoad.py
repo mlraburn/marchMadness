@@ -120,14 +120,17 @@ def get_record(team: str) -> tuple[int, int]:
     return wins, losses  # return tuple
 
 
-def sched_dif(team: str) -> float:
+def strength_of_schedule_calculator(team: str) -> float:
     """
-    Returns the difficulty of schedule
+    Returns the strength of schedule
 
     This is a Matt R. algorithm for this that takes into account the final seed value of the teams they played
     The more seeded teams a team plays and the higher their seeds the lower the value will be approaching 0
 
     ** NOTE ** this assumes the first four have already played their game and we know who advanced.
+
+    ** The output distribution is exponential as team over all rank increases. **
+    ** About 50% of teams have a strength of schedule below 1 and 50% have a strength of schedule above 50% **
 
     :param team: team name
     :return: Float indicating difficulty of schedule. 0 means tougher
@@ -144,17 +147,23 @@ def sched_dif(team: str) -> float:
 
         # Check to see if the opponent is in the top 64
         if opponent in tournament_dataframe['TEAM_NAME'].tolist():
-            top_64 = top_64 + 1
-            opp_info = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]
-            opp_dif = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]['SEED'].iloc[0]  # get opponents seed
-            dif = dif + opp_dif  # add up the difficulty
+
+            top_64 = top_64 + 1  # Increment the number of top 64 teams they play
+
+            # get opponents seed
+            opp_dif = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]['SEED'].iloc[0]
+            dif = dif + opp_dif  # add up the difficulty (golf rules)
 
     # special case if the team never plays a top 64
     if top_64 == 0:
-        return 32 * 64  # no clue if this is correct but it makes them have the weakest schedule no matter what
+        return 32  # return 32 this puts them outside of any team that plays at least one top 64 team
     else:
         dif_avg = dif / top_64  # get the average difficulty (golf rules)
-        s_o_s = dif_avg / top_64  # I don't remembe why I did this but there was a reason
+
+        # divide the average difficulty by the number of top 64 teams they played
+        # this ensures that a team that played a 1, 1 time will have a higher sos than a team that played 1, 2 times.
+        s_o_s = dif_avg / top_64  # divide the average difficulty by the number of top 64 teams they played
+
         return s_o_s
 
 
@@ -276,7 +285,7 @@ def main():
 
     # Loop Calculates the values for each team
     for team in team_list:
-        sos = sched_dif(team)
+        sos = strength_of_schedule_calculator(team)
         analysis_dictionary['TEAM'].append(team)
         seed = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]
         win_loss = get_record(team)
@@ -306,7 +315,7 @@ def main():
 
     sos_df = pandas.DataFrame(analysis_dictionary)
 
-    sorted_sos = sos_df.sort_values('MELO', ascending=False)
+    sorted_sos = sos_df.sort_values('SOS', ascending=False)
     sos_df.to_csv('analysis.csv')
 
     print(sorted_sos.to_string())
