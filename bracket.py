@@ -41,24 +41,25 @@ def visualize_ncaab_bracket(path: str) -> None:
         midwest_winner_6 = find_teams_in_rounds_in_csv(6, 15, 0, regions[3], path)
 
         print(f"{east_winner[0]} {east_winner[1]}")
-        print(f"{west_winner[0]} {west_winner[1]}")
+        print(f"{midwest_winner[0]} {midwest_winner[1]}")
 
-        if east_winner_6 == west_winner_6:
+        if east_winner_6 == midwest_winner_6:
             print(f"\t\t\t\t\t\t\t\t{east_winner_6[0]} {east_winner_6[1]}")
-        elif east_winner_6[0] == "________" and west_winner_6 != "________":
-            print(f"\t\t\t\t\t\t\t\t{west_winner_6[0]} {west_winner_6[1]}")
+        elif east_winner_6[0] == "________" and midwest_winner_6 != "________":
+            print(f"\t\t\t\t\t\t\t\t{midwest_winner_6[0]} {midwest_winner_6[1]}")
         else:
             print(f"\t\t\t\t\t\t\t\t{east_winner_6[0]} {east_winner_6[1]}")
 
-        if south_winner_6 == midwest_winner_6:
+        if south_winner_6 == west_winner_6:
             print(f"\t\t\t\t\t\t\t\t{south_winner_6[0]} {south_winner_6[1]}")
-        elif south_winner_6[0] == "________" and midwest_winner_6 != "________":
-            print(f"\t\t\t\t\t\t\t\t{midwest_winner_6[0]} {midwest_winner_6[1]}")
+        elif south_winner_6[0] == "________" and west_winner_6 != "________":
+            print(f"\t\t\t\t\t\t\t\t{west_winner_6[0]} {west_winner_6[1]}")
         else:
             print(f"\t\t\t\t\t\t\t\t{south_winner_6[0]} {south_winner_6[1]}")
 
         print(f"{south_winner[0]} {south_winner[1]}")
-        print(f"{midwest_winner[0]} {midwest_winner[1]}")
+        print(f"{west_winner[0]} {west_winner[1]}")
+
 
         print("")
         print(f"**CHAMPION**    **CHAMPION**    **CHAMPION**    **CHAMPION**")
@@ -145,6 +146,12 @@ def find_teams_in_rounds_in_csv(rnd: int, up: int, lb: int, region: str, path: s
 
 
 def elo_prob(top_melo, bottom_melo) -> float:
-    dif_elo = top_melo - bottom_melo
+    dif_elo = int(top_melo) - int(bottom_melo)
 
-    return (.1041 * dif_elo) + 51.0099
+    # 2024 it was .1041 * dif_elo + 51.0099
+    # adjusted to 0.07256*X + 53.23
+    prob_to_win = (.07256 * dif_elo) + 53.23
+    if prob_to_win >= 100:
+        return 98.7
+    else:
+        return prob_to_win

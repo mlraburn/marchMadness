@@ -13,7 +13,8 @@ import bracket  # custom package with bracket functions
 # -------------------
 
 # Schedule information
-schedule_dataframe_raw: pandas.DataFrame = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")  # file is downloaded from ???
+schedule_dataframe_raw: pandas.DataFrame = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")  # file is downloaded from
+# big backet ball data
 schedule_dataframe: pandas.DataFrame = schedule_dataframe_raw[['GAME-ID', 'TEAM', 'F']]  # filter these columns in the excel file
 # GAME-ID: unique integer for each game.  A game consists of 2 rows one for each team in the game but with the same
 # GAME-ID.
@@ -22,10 +23,10 @@ schedule_dataframe: pandas.DataFrame = schedule_dataframe_raw[['GAME-ID', 'TEAM'
 
 # load the marchMadness table which has initial values of the tourney
 # marchMadness table is set manually
-tournament_dataframe: pandas.DataFrame = pandas.read_csv('marchMadTable.csv')
+tournament_dataframe: pandas.DataFrame = pandas.read_csv('marchMadTable_2025.csv')
 
 # load Nate Silvers Data
-nate_silver_data: pandas.DataFrame = pandas.read_csv('NSData.csv')
+nate_silver_data: pandas.DataFrame = pandas.read_csv('nate-silver-data-baysian-elo.csv')
 
 
 def get_game(game_id: int) -> pandas.DataFrame:
@@ -193,7 +194,7 @@ def get_reg_s_perf(team: str) -> int:
     performance and work in a similar fashion. If the loss is expected then the loss doesn't negatively affect the
     performance that much and vice versa.
     :param team: team name
-    :return: performance of team during regular season.  The higher the better.
+    :return: performance of team during regular season. The higher the better.
     """
     game_id_list = get_games_as_id_list(team)  # get game list
 
@@ -211,9 +212,7 @@ def get_reg_s_perf(team: str) -> int:
             else:
                 perf = perf - get_seed(opponent)  # if they lose make them lose perf based on likelyhood of loss
 
-    # -43 was lowest on first run
-    # perf + 43 adds the adjustment so they don't have any negative values
-    return perf + 43
+    return perf
 
 
 def get_region(team: str) -> str:
@@ -245,11 +244,160 @@ def get_nate_silver_grade(team: str) -> float:
     :param team: team name
     :return: Nate Silver's Team Grade (0 - 100) 100 is better
     """
-    seed = get_seed(team)
-    region = get_region(team)
-    region = all_caps_to_capital_first(region)  # Nate's region is a bit different
 
-    return nate_silver_data[(nate_silver_data['SEED'] == seed) & (nate_silver_data['REGION'] == region)]['NSGRADE'].iloc[0]
+    return nate_silver_data[nate_silver_data['Team'] == team]['Current Elo'].iloc[0]
+    # seed = get_seed(team)
+    # region = get_region(team)
+    # region = all_caps_to_capital_first(region)  # Nate's region is a bit different
+
+    # return nate_silver_data[(nate_silver_data['SEED'] == seed) & (nate_silver_data['REGION'] == region)]['NSGRADE'].iloc[0]
+
+
+def win_loss_difference_strength_of_schedule(win: int, loss: int, strength_of_schedule: float) -> float:
+    """
+    Returns the win loss difference divided by the strenght of schedule
+
+    This means the higher the output the better the team
+
+    :return:
+    """
+
+    # In the crazy situation that the team has a win loss delta of 0 or less than 0 then return 0 the lowest score
+    if (win - loss) <= 0:
+        return 0
+
+    windifsos: float = (win - loss) / strength_of_schedule
+
+    return windifsos
+
+
+def get_MELO(team: str) -> int:
+    """
+    Returns the MELO based on the team name
+    :param team:
+    :return:
+    """
+    analysis_df = pandas.read_csv('analysis.csv')
+
+    return int(analysis_df[analysis_df['TEAM'] == team]['MELO'].iloc[0])
+
+
+def normalize_1_to_100(values: list[any]) -> tuple:
+    """
+    Returns the scaling factor along with the shift required with the new min value and old minimum value
+
+    :param values:
+    :return: (scaling factor, new minumum, old minumum)
+    """
+    new_min: float = 1
+    new_max: float = 100
+
+    old_minimum_value = min(values)
+    old_maximum_value = max(values)
+
+    old_range = old_maximum_value - old_minimum_value
+    new_range = new_max - new_min  # set all values between 100 and 1
+
+    scale_factor = new_range / old_range
+
+    return scale_factor, new_min, old_minimum_value
+
+def create_analysis() -> pandas.DataFrame:
+    # get list of teams
+    team_list: list[str] = tournament_dataframe['TEAM_NAME'].tolist()
+
+    # declare the analysis dictionary
+    analysis_dictionary = {'TEAM': [], 'SEED': [], 'WINS': [], 'LOSSES': [], 'SOS': [], 'REGION': [], 'ORDER': [],
+                           'WINDIFSOS': [], 'SCH_PERF': [], 'NSGRADE': [], 'MELO': []}
+
+    # TEAM: name of team as                 str
+    # SEED: seed given to team              int
+    # WINS: wins during regular season      int
+    # LOSSES: losses during regular season  int
+    # SOS: strength of schedule (my calc)   float   Most close to 0. The closest to 0 the harder the schedule
+    # REGION: region in tourney             str
+    # ORDER: order in region                int     This is a visual order and indicates who is playing who in regions
+    # WINDIFSOS: ??????????????             float   ????????
+    # SHC_PERF: schedule performance        int     How good a team did during their schedule. ?????
+    # NSGRADE: Nate Silver Score            float   0-100. The closer to 100 the better.
+    # MELO: Matt's ELO                      int     Higher the better. Combination of NSGRADE, WINDIFSOS and SCH_PERF
+
+    # Loop Calculates the values for each team
+    for team in team_list:
+        sos = strength_of_schedule_calculator(team)  # calculate the strength of schedule
+
+        seed = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]  # get the seed
+
+        win_loss = get_record(team)  # get the win loss record as a tuple (W L)
+        wins = win_loss[0]
+        losses = win_loss[1]
+
+        region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
+        order = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
+
+        win_loss_dif_sos = win_loss_difference_strength_of_schedule(wins, losses, sos)
+        perf = get_reg_s_perf(team)
+
+        ns_elo = get_nate_silver_grade(team)
+
+        # add data to analysis dictionary
+        analysis_dictionary['TEAM'].append(team)
+        analysis_dictionary['SEED'].append(seed)
+        analysis_dictionary['WINS'].append(wins)
+        analysis_dictionary['LOSSES'].append(losses)
+        analysis_dictionary['SOS'].append(sos)
+        analysis_dictionary['REGION'].append(region)
+        analysis_dictionary['ORDER'].append(order)
+        analysis_dictionary['WINDIFSOS'].append(win_loss_dif_sos)
+        analysis_dictionary['SCH_PERF'].append(perf)
+        analysis_dictionary['NSGRADE'].append(ns_elo)
+
+    # ---NORMALIZATION OF DATA---
+
+    normalize_tuple_wds = normalize_1_to_100(analysis_dictionary['WINDIFSOS'])
+    normalize_tuple_sp = normalize_1_to_100(analysis_dictionary['SCH_PERF'])
+    normalize_tuple_nsg = normalize_1_to_100(analysis_dictionary['NSGRADE'])
+
+    for i, team in enumerate(team_list):
+        adjusted_win_dif_sos = (analysis_dictionary['WINDIFSOS'][i] - normalize_tuple_wds[2]) * normalize_tuple_wds[0] + \
+                               normalize_tuple_wds[1]
+        analysis_dictionary['WINDIFSOS'][i] = adjusted_win_dif_sos
+
+        adjusted_perf = (analysis_dictionary['SCH_PERF'][i] - normalize_tuple_sp[2]) * normalize_tuple_sp[0] + \
+                        normalize_tuple_sp[1]
+        analysis_dictionary['SCH_PERF'][i] = adjusted_perf
+
+        adjusted_ns_elo = (analysis_dictionary['NSGRADE'][i] - normalize_tuple_nsg[2]) * normalize_tuple_nsg[0] + \
+                          normalize_tuple_nsg[1]
+        analysis_dictionary['NSGRADE'][i] = adjusted_ns_elo
+
+        weight_windifsos = 0.5
+        weight_schedule_performance = 2.5
+        weight_nate_silver = 5.0
+
+        melo = (
+                (analysis_dictionary['WINDIFSOS'][i] ** weight_windifsos) *
+                (analysis_dictionary['SCH_PERF'][i] ** weight_schedule_performance) *
+                (analysis_dictionary['NSGRADE'][i] ** weight_nate_silver)
+        )
+
+        analysis_dictionary['MELO'].append(int(math.log(melo) * 50))
+
+    sos_df = pandas.DataFrame(analysis_dictionary)
+
+    sos_df['SOS'] = sos_df['SOS'].round(decimals=2)
+    sos_df['WINDIFSOS'] = sos_df['WINDIFSOS'].round(decimals=2)
+    sos_df['SCH_PERF'] = sos_df['SCH_PERF'].round(decimals=2)
+    sos_df['MELO'] = sos_df['MELO'].round(decimals=0)
+    sos_df['NSGRADE'] = sos_df['NSGRADE'].round(decimals=2)
+
+    sorted_sos = sos_df.sort_values('MELO', ascending=False).reset_index(drop=True)
+    sorted_sos['RANK'] = range(1, len(sorted_sos) + 1)
+
+    # Reorder the columns so RANK is first
+    sorted_sos = sorted_sos[['RANK'] + [col for col in sorted_sos.columns if col != 'RANK']]
+
+    return sorted_sos
 
 
 def main():
@@ -285,48 +433,87 @@ def main():
 
     # Loop Calculates the values for each team
     for team in team_list:
-        sos = strength_of_schedule_calculator(team)
-        analysis_dictionary['TEAM'].append(team)
-        seed = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]
-        win_loss = get_record(team)
+        sos = strength_of_schedule_calculator(team)  # calculate the strength of schedule
+
+        seed = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['SEED'].iloc[0]  # get the seed
+
+        win_loss = get_record(team)  # get the win loss record as a tuple (W L)
         wins = win_loss[0]
         losses = win_loss[1]
+
+        region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
+        order = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
+
+        win_loss_dif_sos = win_loss_difference_strength_of_schedule(wins, losses, sos)
+        perf = get_reg_s_perf(team)
+
+        ns_elo = get_nate_silver_grade(team)
+
+        # add data to analysis dictionary
+        analysis_dictionary['TEAM'].append(team)
         analysis_dictionary['SEED'].append(seed)
         analysis_dictionary['WINS'].append(wins)
         analysis_dictionary['LOSSES'].append(losses)
         analysis_dictionary['SOS'].append(sos)
-        region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
         analysis_dictionary['REGION'].append(region)
-        order = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
         analysis_dictionary['ORDER'].append(order)
-
-        # minimum is -4 + (2/3.0)
-        # adjust by adding the above min
-        win_loss_sos = (wins - losses) / sos
-        win_loss_sos = abs(win_loss_sos + 4 + (2 / 3))
-        win_loss_sos = win_loss_sos.__round__(1) + 1
-        analysis_dictionary['WINDIFSOS'].append(win_loss_sos)
-        perf = get_reg_s_perf(team) + 1
+        analysis_dictionary['WINDIFSOS'].append(win_loss_dif_sos)
         analysis_dictionary['SCH_PERF'].append(perf)
-        ns_grade = get_nate_silver_grade(team)
-        analysis_dictionary['NSGRADE'].append(ns_grade)
-        melo = win_loss_sos * perf * ns_grade + 1
-        analysis_dictionary['MELO'].append((math.log(melo) * 100).__round__(0))
+        analysis_dictionary['NSGRADE'].append(ns_elo)
+
+
+    # ---NORMALIZATION OF DATA---
+
+    normalize_tuple_wds = normalize_1_to_100(analysis_dictionary['WINDIFSOS'])
+    normalize_tuple_sp = normalize_1_to_100(analysis_dictionary['SCH_PERF'])
+    normalize_tuple_nsg = normalize_1_to_100(analysis_dictionary['NSGRADE'])
+
+    for i, team in enumerate(team_list):
+
+        adjusted_win_dif_sos = (analysis_dictionary['WINDIFSOS'][i] - normalize_tuple_wds[2]) * normalize_tuple_wds[0] + normalize_tuple_wds[1]
+        analysis_dictionary['WINDIFSOS'][i] = adjusted_win_dif_sos
+
+        adjusted_perf = (analysis_dictionary['SCH_PERF'][i] - normalize_tuple_sp[2]) * normalize_tuple_sp[0] + normalize_tuple_sp[1]
+        analysis_dictionary['SCH_PERF'][i] = adjusted_perf
+
+        adjusted_ns_elo = (analysis_dictionary['NSGRADE'][i] - normalize_tuple_nsg[2]) * normalize_tuple_nsg[0] + normalize_tuple_nsg[1]
+        analysis_dictionary['NSGRADE'][i] = adjusted_ns_elo
+
+        weight_windifsos = 0.5
+        weight_schedule_performance = 2.5
+        weight_nate_silver = 5.0
+
+        melo = (
+            (analysis_dictionary['WINDIFSOS'][i] ** weight_windifsos) *
+            (analysis_dictionary['SCH_PERF'][i] ** weight_schedule_performance) *
+            (analysis_dictionary['NSGRADE'][i] ** weight_nate_silver)
+        )
+
+        analysis_dictionary['MELO'].append(int(math.log(melo) * 50))
 
     sos_df = pandas.DataFrame(analysis_dictionary)
 
-    sorted_sos = sos_df.sort_values('SOS', ascending=False)
+    sos_df['SOS'] = sos_df['SOS'].round(decimals=2)
+    sos_df['WINDIFSOS'] = sos_df['WINDIFSOS'].round(decimals=2)
+    sos_df['SCH_PERF'] = sos_df['SCH_PERF'].round(decimals=2)
+    sos_df['MELO'] = sos_df['MELO'].round(decimals=0)
+    sos_df['NSGRADE'] = sos_df['NSGRADE'].round(decimals=2)
+
+    sorted_sos = sos_df.sort_values('MELO', ascending=False).reset_index(drop=True)
+    sorted_sos['RANK'] = range(1, len(sorted_sos) + 1)
+
+    # Reorder the columns so RANK is first
+    sorted_sos = sorted_sos[['RANK'] + [col for col in sorted_sos.columns if col != 'RANK']]
+
     sos_df.to_csv('analysis.csv')
 
     print(sorted_sos.to_string())
 
-    print(bracket.elo_prob(1148, 1037))
-
-    # bracket.visualize_ncaab_bracket('marchMadTable.csv')
+    # bracket.visualize_ncaab_bracket('marchMadTable_2024.csv')
     # print(bracket.line_to_round(12,16))
     # print(bracket.get_upper_bound(23,3))
 
-    # name = bracket.find_team_name_in_csv(1, 15, 15, 'SOUTH', 'marchMadTable.csv')
+    # name = bracket.find_team_name_in_csv(1, 15, 15, 'SOUTH', 'marchMadTable_2024.csv')
     # print(name)
 
 

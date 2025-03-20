@@ -5,10 +5,12 @@ import dataDownLoad
 import bracket
 import csv
 
+from marchMadness.bracket import elo_prob
+
 sd_raw = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")
 sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
 
-td = pandas.read_csv('marchMadTable.csv')
+td = pandas.read_csv('marchMadTable_2024.csv')
 nsd = pandas.read_csv('NSData.csv')
 
 
@@ -102,7 +104,7 @@ def find_team_in_order_range(rnd, region, upper, lower, df: pandas.DataFrame) ->
 
 def simulate_mm() -> pandas.DataFrame:
     regions = ['EAST', 'WEST', 'SOUTH', 'MIDWEST']
-    tourney_df = pandas.read_csv('marchMadTable.csv')
+    tourney_df = pandas.read_csv('marchMadTable_2025.csv')
     rnd = 1
 
     while rnd < 5:
@@ -131,6 +133,22 @@ def simulate_mm() -> pandas.DataFrame:
                                                            tourney_df)
                     cur_pos = cur_pos + range_to_search
 
+                """
+                THIS IS ALL FOR TESTING AND FIXING THE ISSUE WITH UNDER DOGS WINNING TOO MUCH
+                
+                print(f"Top Team: {top_team}")
+                print(f"Bottom Team: {bottom_team}")
+                print(f"{top_team} {dataDownLoad.get_seed(top_team)} vs {bottom_team} {dataDownLoad.get_seed(bottom_team)}:")
+                print(f"ELOs: {dataDownLoad.get_MELO(top_team)} vs {dataDownLoad.get_MELO(bottom_team)}")
+                print(f"ELO dif: {int(dataDownLoad.get_MELO(top_team))-int(dataDownLoad.get_MELO(bottom_team))}")
+                if int(dataDownLoad.get_MELO(top_team)) - int(dataDownLoad.get_MELO(bottom_team)) <= 0:
+                    print(f"Probability of 2nd team winning: {elo_prob(dataDownLoad.get_MELO(bottom_team), dataDownLoad.get_MELO(top_team))}")
+                else:
+                    print(f"Probability of 1st team winning: {elo_prob(dataDownLoad.get_MELO(top_team), dataDownLoad.get_MELO(bottom_team))}")
+
+                print()
+                """
+
                 winning_team = game(top_team, bottom_team)
                 seed = dataDownLoad.get_seed(winning_team)
                 order = tourney_df[tourney_df['TEAM_NAME'] == winning_team]['ORDER_IN_REGION'].iloc[0]
@@ -145,31 +163,33 @@ def simulate_mm() -> pandas.DataFrame:
     # hard code final four
     east_winner = find_team_in_order_range(5, 'EAST', 15, 0, tourney_df)
     west_winner = find_team_in_order_range(5, 'WEST', 15, 0, tourney_df)
-    winner_ew = game(east_winner, west_winner)
-    seed = dataDownLoad.get_seed(winner_ew)
-    order = tourney_df[tourney_df['TEAM_NAME'] == winner_ew]['ORDER_IN_REGION'].iloc[0]
-    region = dataDownLoad.get_region(winner_ew)
+    south_winner = find_team_in_order_range(5, 'SOUTH', 15, 0, tourney_df)
+    midwest_winner = find_team_in_order_range(5, 'MIDWEST', 15, 0, tourney_df)
 
-    row_to_add = {'TEAM_NAME': winner_ew, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
+    winner_emw = game(east_winner, midwest_winner)
+    seed = dataDownLoad.get_seed(winner_emw)
+    order = tourney_df[tourney_df['TEAM_NAME'] == winner_emw]['ORDER_IN_REGION'].iloc[0]
+    region = dataDownLoad.get_region(winner_emw)
+
+    row_to_add = {'TEAM_NAME': winner_emw, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
     tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
-    south_winner = find_team_in_order_range(5, 'SOUTH', 15, 0, tourney_df)
-    midwest_winner = find_team_in_order_range(5, 'MIDWEST', 15, 0, tourney_df)
-    winner_sm = game(south_winner, midwest_winner)
-    seed = dataDownLoad.get_seed(winner_sm)
-    order = tourney_df[tourney_df['TEAM_NAME'] == winner_sm]['ORDER_IN_REGION'].iloc[0]
-    region = dataDownLoad.get_region(winner_sm)
 
-    row_to_add = {'TEAM_NAME': winner_sm, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
+    winner_sw = game(south_winner, west_winner)
+    seed = dataDownLoad.get_seed(winner_sw)
+    order = tourney_df[tourney_df['TEAM_NAME'] == winner_sw]['ORDER_IN_REGION'].iloc[0]
+    region = dataDownLoad.get_region(winner_sw)
+
+    row_to_add = {'TEAM_NAME': winner_sw, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
 
     tourney_df = tourney_df._append(row_to_add, ignore_index=True)
 
     rnd = rnd + 1
 
-    champion = game(winner_ew, winner_sm)
+    champion = game(winner_emw, winner_sw)
     seed = dataDownLoad.get_seed(champion)
     order = tourney_df[tourney_df['TEAM_NAME'] == champion]['ORDER_IN_REGION'].iloc[0]
     region = dataDownLoad.get_region(champion)
@@ -183,8 +203,8 @@ def simulate_mm() -> pandas.DataFrame:
 
 
 def main():
-    a_df = create_analysis_df()
-    a_df.to_csv('analysis.csv', index=False)
+    a_df = pandas.read_csv('analysis.csv')
+    # a_df.to_csv('analysis.csv', index=False)
 
     print(f"WELCOME TO MATT'S MARCH MADNESS BRACKET PROGRAM")
     print()
@@ -201,7 +221,7 @@ def main():
             exit(0)
         elif i == 'S':
             print("not working yet")
-            bracket.visualize_ncaab_bracket('marchMadTable.csv')
+            bracket.visualize_ncaab_bracket('marchMadTable_2025.csv')
         elif i == 'M':
             config = open('config.csv')
             config_data = config.readlines()
