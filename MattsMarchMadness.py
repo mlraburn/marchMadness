@@ -4,6 +4,7 @@ import math
 import dataDownLoad
 import bracket
 import csv
+import sys  # base python
 
 from marchMadness.bracket import elo_prob
 
@@ -208,7 +209,12 @@ def main():
 
     print(f"WELCOME TO MATT'S MARCH MADNESS BRACKET PROGRAM")
     print()
+
     i = ""
+
+    if len(sys.argv) > 1:
+        i = sys.argv[1].split()[0]
+
     while i != 'Q':
         print("MAIN MENU")
         print("Q: Quit")
@@ -216,7 +222,8 @@ def main():
         print("M: Make Brackets")
         print("P: Print Bracket")
         print("A: Print Analysis")
-        i = input(":")
+        if len(sys.argv) == 1:
+            i = input(":")
         if i == 'Q':
             exit(0)
         elif i == 'S':
@@ -241,11 +248,19 @@ def main():
             writer.writerow([new_serial])
             config.close()
         elif i == 'P':
-            path = input("path:")
+            if len(sys.argv) > 1:
+                path = sys.argv[1].split()[1]
+            else:
+                path = input("path:")
             bracket.visualize_ncaab_bracket(path)
         elif i == "A":
             a_df.sort_values(by='MELO', ascending=False)
             print(a_df.to_string(index=False))
+        elif i == "toast":
+            print("toast")
+
+        if len(sys.argv) > 1:
+            break
 
 
 def amount_of_games(rnd) -> int:
