@@ -12,8 +12,22 @@ function navigateToPage(page) {
     // Update the URL without refreshing
     history.pushState({ page }, '', `/${page}`);
 
-    // Load the page content dynamically (simulate client-side navigation)
-    loadPageContent(page);
+    // Fetch the page content dynamically
+    fetch(`/${page}`)
+        .then(response => response.text())
+        .then(html => {
+            // Create a temporary DOM parser to extract the `<main>` content
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = html;
+
+            const mainContent = tempDiv.querySelector('main'); // Extract only the main content
+            if (mainContent) {
+                document.getElementById('content').innerHTML = mainContent.innerHTML;
+            } else {
+                console.error('Main content not found in the fetched HTML.');
+            }
+        })
+        .catch(err => console.error('Error loading page:', err));
 }
 
 // Function to select a button

@@ -1,3 +1,7 @@
+html {
+    overflow-y: scroll; /* Forces the vertical scrollbar to always be present */
+}
+
 /* Body styling */
 body {
     font-family: Arial, sans-serif;
@@ -52,7 +56,46 @@ header {
     border-radius: 10px; /* Matches the buttons' corner radius */
     box-sizing: border-box; /* Includes the border in the dimensions */
     transition: left 0.5s ease, top 0.5s ease, width 0.5s ease, height 0.5s ease; /* Smooth animations */
-    transition-delay: 0.2s;
     z-index: 10;
 }
+
+/* Table container styling */
+.table-container {
+    display: flex;
+    justify-content: center; /* Centers the table horizontally */
+    align-items: center; /* Centers content vertically if needed */
+    margin: 20px auto; /* Adds spacing around the table */
+    max-width: 80%; /* Prevents the table from spanning the full screen */
+}
+
+/* Table styling */
+.table {
+    width: 100%; /* Table adjusts within its container */
+    border-collapse: collapse; /* Removes gaps between table borders */
+    font-size: 18px;
+    text-align: center; /* Centers text inside the table cells */
+}
+
+.table th, .table td {
+    border: 1px solid #dddddd;
+    padding: 8px 12px;
+}
+
+.table th {
+    background-color: #003366; /* Dark blue */
+    color: #ffcc00; /* Bright yellow */
+}
+
+.table td {
+    color: #333333; /* Slightly darker text for table cells */
+}
+
+/* Add a bit of styling for aesthetics */
+.table-container h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    color: #003366;
+}
+
+
 

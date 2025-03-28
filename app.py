@@ -1,9 +1,11 @@
 from flask import Flask, render_template, request
 import subprocess
+import pandas as pd
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
+@app.route('/home', methods=['GET', 'POST'])
 def home():
     output = ""
     if request.method == 'POST':
@@ -23,21 +25,19 @@ def home():
 
     return render_template('index.html', output=output)
 
-@app.route('/display_analysis', methods=['POST'])
-def display_analysis():
-    # This route executes specific Python code
-    try:
-        # Replace 'your_script.py' with the Python script or function you want to execute
-        result = subprocess.run(
-            ['python', 'marchMadness.py'],  # Replace this with the Python file or code you want to run
-            capture_output=True,
-            text=True
-        )
-        output = result.stdout if result.returncode == 0 else result.stderr
-    except Exception as e:
-        output = f"Error occurred: {str(e)}"
 
-    return render_template('index.html', output=output)
+@app.route('/analysis')
+def analysis():
+    # Load CSV data using pandas
+    try:
+        df = pd.read_csv('analysis.csv')
+        # Convert the dataframe to an HTML table
+        data_table = df.to_html(classes='table table-striped', index=False)
+    except Exception as e:
+        data_table = f"<p>Error loading analysis: {str(e)}</p>"
+
+    # Render the analysis page with the table
+    return render_template('analysis.html', table=data_table)
 
 if __name__ == '__main__':
     app.run(debug=True)
