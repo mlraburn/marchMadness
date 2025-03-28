@@ -22,18 +22,21 @@ header {
     gap: 20px; /* Add space between buttons */
     background-color: #003366; /* Dark blue background */
     padding: 10px 20px;
+    position: relative; /* Needed for the selection border positioning */
 }
 
 /* Button styling */
 .banner button {
-    background-color: #003366; /* Same as banner background */
+    background-color: #003366; /* Match banner background */
     color: #ffcc00; /* Bright yellow text */
     border: none;
-    padding: 10px 20px;
+    padding: 10px 20px; /* Adjust button size */
     font-size: 16px;
-    border-radius: 5px;
+    border-radius: 5px; /* Rounded corners */
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
+    position: relative;
+    z-index: 1; /* Ensure buttons are above the selection border */
 }
 
 /* Hover effect for buttons */
@@ -42,18 +45,16 @@ header {
     color: #003366; /* Dark blue text on hover */
 }
 
-/* Main content styling */
-main {
-    margin: 0 auto;
-    max-width: 800px;
-    text-align: center;
-    padding: 20px;
-}
-
-form {
-    margin-bottom: 20px;
-}
-
-form label {
-    color: #003366; /* Dark blue text for labels */
+/* Selection border styling */
+.selection-border {
+    transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1), width 0.4s cubic-bezier(0.25, 1, 0.5, 1), height 0.4s ease;
+    transition-delay: 0.1s;
+    position: absolute;
+    height: calc(100% + 4px); /* Ensure height matches button + small margin */
+    width: 0; /* Starts at 0, dynamically adjusts */
+    border: 2px solid #ffcc00; /* Bright yellow border */
+    border-radius: 5px; /* Matches button corner radius */
+    box-sizing: border-box; /* Ensures border is included in dimensions */
+    z-index: 0; /* Behind the buttons */
+    top: calc(50% - 50%); /* Center vertically relative to the button */
 }

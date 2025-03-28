@@ -3,34 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Matt's March Madness</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 </head>
 <body>
     <header>
         <h1>Matt's March Madness Bracket Simulator/Creator</h1>
         <nav class="banner">
-            <button onclick="alert('Home clicked!')">Home</button>
-            <button onclick="alert('Generate Bracket clicked!')">Generate Bracket</button>
-            <button onclick="alert('Score Bracket clicked!')">Score Bracket</button>
-            <button onclick="alert('Analysis clicked!')">Analysis</button>
-            <button onclick="alert('Help clicked!')">Help</button>
+            <nav class="selection-border" id="selection-border"></nav>
+            <button onclick="navigateToPage('home')">Home</button>
+            <button onclick="navigateToPage('generate-bracket')">Generate Bracket</button>
+            <button onclick="navigateToPage('score-bracket')">Score Bracket</button>
+            <button onclick="navigateToPage('analysis')">Analysis</button>
+            <button onclick="navigateToPage('help')">Help</button>
         </nav>
     </header>
 
-    <main>
-        <h1>Input:</h1>
-        <form method="POST" action="/">
-            <label for="user_input">Enter text:</label>
-            <input type="text" id="user_input" name="user_input" required>
-            <button type="submit">Submit</button>
-        </form>
-        <form method="POST" action="/display_analysis">
-            <button type="submit">Analysis</button>
-        </form>
+    <main id="content">
+        <h2>Welcome to Matt's March Madness!</h2>
+        <p>Click on any button to navigate through the application without reloading the page.</p>
     </main>
 
-    <h3>Output:</h3>
-    <pre>{{ output }}</pre>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
