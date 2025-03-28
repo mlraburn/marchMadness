@@ -1,0 +1,59 @@
+/* Body styling */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f8ff; /* Light blue background */
+}
+
+/* Header styling */
+header {
+    text-align: center;
+    background-color: #003366; /* Dark blue */
+    color: #ffcc00; /* Bright yellow */
+    padding: 10px 0;
+    margin-bottom: 20px;
+}
+
+/* Banner navigation bar */
+.banner {
+    display: flex;
+    justify-content: center; /* Center buttons horizontally */
+    gap: 20px; /* Add space between buttons */
+    background-color: #003366; /* Dark blue background */
+    padding: 10px 20px;
+}
+
+/* Button styling */
+.banner button {
+    background-color: #003366; /* Same as banner background */
+    color: #ffcc00; /* Bright yellow text */
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Hover effect for buttons */
+.banner button:hover {
+    background-color: #ffcc00; /* Bright yellow background on hover */
+    color: #003366; /* Dark blue text on hover */
+}
+
+/* Main content styling */
+main {
+    margin: 0 auto;
+    max-width: 800px;
+    text-align: center;
+    padding: 20px;
+}
+
+form {
+    margin-bottom: 20px;
+}
+
+form label {
+    color: #003366; /* Dark blue text for labels */
+}

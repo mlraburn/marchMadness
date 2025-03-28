@@ -2,16 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <title>Matt's March Madness</title>
 </head>
 <body>
-    <h1>Matt's March Madness Bracket Simulator/Creator</h1>
-    <h2>Input:</h2>
-    <form method="POST" action="/">
-        <label for="user_input">Enter text:</label>
-        <input type="text" id="user_input" name="user_input" required>
-        <button type="submit">Submit</button>
-    </form>
+    <header>
+        <h1>Matt's March Madness Bracket Simulator/Creator</h1>
+        <nav class="banner">
+            <button onclick="alert('Home clicked!')">Home</button>
+            <button onclick="alert('Generate Bracket clicked!')">Generate Bracket</button>
+            <button onclick="alert('Score Bracket clicked!')">Score Bracket</button>
+            <button onclick="alert('Analysis clicked!')">Analysis</button>
+            <button onclick="alert('Help clicked!')">Help</button>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Input:</h1>
+        <form method="POST" action="/">
+            <label for="user_input">Enter text:</label>
+            <input type="text" id="user_input" name="user_input" required>
+            <button type="submit">Submit</button>
+        </form>
+        <form method="POST" action="/display_analysis">
+            <button type="submit">Analysis</button>
+        </form>
+    </main>
+
     <h3>Output:</h3>
     <pre>{{ output }}</pre>
 </body>

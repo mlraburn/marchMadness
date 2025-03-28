@@ -23,5 +23,21 @@ def home():
 
     return render_template('index.html', output=output)
 
+@app.route('/display_analysis', methods=['POST'])
+def display_analysis():
+    # This route executes specific Python code
+    try:
+        # Replace 'your_script.py' with the Python script or function you want to execute
+        result = subprocess.run(
+            ['python', 'marchMadness.py'],  # Replace this with the Python file or code you want to run
+            capture_output=True,
+            text=True
+        )
+        output = result.stdout if result.returncode == 0 else result.stderr
+    except Exception as e:
+        output = f"Error occurred: {str(e)}"
+
+    return render_template('index.html', output=output)
+
 if __name__ == '__main__':
     app.run(debug=True)
