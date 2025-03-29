@@ -83,6 +83,31 @@ function loadPageContent(page) {
     }
 }
 
+// Function to sort the analysis table
+function sortTable(columnName) {
+    const table = document.getElementById('analysis-table');
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+
+    rows.sort((a, b) => {
+        // Get the value of the column for sorting
+        const aValue = parseFloat(a.querySelector(`td:nth-child(${getColumnIndex(columnName)})`).textContent);
+        const bValue = parseFloat(b.querySelector(`td:nth-child(${getColumnIndex(columnName)})`).textContent);
+
+        // Sort descending by MELO
+        return bValue - aValue;
+    });
+
+    // Clear the existing rows and append the sorted rows
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = ''; // Clear existing rows
+    rows.forEach(row => tbody.appendChild(row)); // Add sorted rows
+}
+
+function getColumnIndex(columnName) {
+    const headerCells = document.querySelectorAll('#analysis-table thead th');
+    return Array.from(headerCells).findIndex(th => th.textContent.trim() === columnName) + 1;
+}
+
 // Handle page load based on the current URL
 window.onload = () => {
     const page = window.location.pathname.replace('/', '') || 'home';

@@ -74,16 +74,28 @@ header {
     border-collapse: collapse; /* Removes gaps between table borders */
     font-size: 18px;
     text-align: center; /* Centers text inside the table cells */
+    table-layout: auto;
 }
 
 .table th, .table td {
+    width: auto;
     border: 1px solid #dddddd;
     padding: 8px 12px;
+    text-align: center;
+    vertical-align: middle;
 }
 
 .table th {
     background-color: #003366; /* Dark blue */
     color: #ffcc00; /* Bright yellow */
+    cursor: pointer; /* Adds a clickable cursor to headers */
+    padding: 8px 12px; /* Adjusts header spacing */
+    text-align: center; /* Centers header text */
+}
+
+.table th:hover {
+    background-color: #ffcc00; /* Highlight header on hover */
+    color: #003366; /* Dark blue text */
 }
 
 .table td {

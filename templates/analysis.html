@@ -1,6 +1,8 @@
-<main>
-    <h2>Analysis Table</h2>
-    <div class="table-container">
-        {{ table|safe }}  <!-- Display the table dynamically -->
-    </div>
-</main>
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Analysis Table</h2>
+<div class="table-container">
+    {{ table|safe }}
+</div>
+{% endblock %}

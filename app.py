@@ -28,16 +28,13 @@ def home():
 
 @app.route('/analysis')
 def analysis():
-    # Load CSV data using pandas
     try:
         df = pd.read_csv('analysis.csv')
-        # Convert the dataframe to an HTML table
         data_table = df.to_html(classes='table table-striped', index=False)
     except Exception as e:
         data_table = f"<p>Error loading analysis: {str(e)}</p>"
-
-    # Render the analysis page with the table
     return render_template('analysis.html', table=data_table)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
