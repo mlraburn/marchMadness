@@ -83,25 +83,40 @@ function loadPageContent(page) {
     }
 }
 
-// Function to sort the analysis table
-function sortTable(columnName) {
+// Function to sort the table when a header is clicked
+function sortTable(columnIndex, header) {
     const table = document.getElementById('analysis-table');
     const rows = Array.from(table.querySelectorAll('tbody tr'));
 
-    rows.sort((a, b) => {
-        // Get the value of the column for sorting
-        const aValue = parseFloat(a.querySelector(`td:nth-child(${getColumnIndex(columnName)})`).textContent);
-        const bValue = parseFloat(b.querySelector(`td:nth-child(${getColumnIndex(columnName)})`).textContent);
+    // Determine sort order: ascending or descending
+    const isAscending = !header.classList.contains('ascending');
 
-        // Sort descending by MELO
-        return bValue - aValue;
+    // Sort rows based on the clicked column
+    rows.sort((a, b) => {
+        const aValue = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+        const bValue = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
+
+        // Handle numeric and string values
+        const aNumber = parseFloat(aValue);
+        const bNumber = parseFloat(bValue);
+        if (!isNaN(aNumber) && !isNaN(bNumber)) {
+            return isAscending ? aNumber - bNumber : bNumber - aNumber;
+        } else {
+            return isAscending ? aValue.localeCompare(bValue) : bValue.localeCompare(aValue);
+        }
     });
 
-    // Clear the existing rows and append the sorted rows
+    // Clear current table rows and append sorted rows
     const tbody = table.querySelector('tbody');
-    tbody.innerHTML = ''; // Clear existing rows
-    rows.forEach(row => tbody.appendChild(row)); // Add sorted rows
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+
+    // Update header styles for visual feedback
+    const headers = table.querySelectorAll('th');
+    headers.forEach(th => th.classList.remove('ascending', 'descending')); // Reset styles
+    header.classList.add(isAscending ? 'ascending' : 'descending'); // Add sorting class
 }
+
 
 function getColumnIndex(columnName) {
     const headerCells = document.querySelectorAll('#analysis-table thead th');
@@ -112,7 +127,14 @@ function getColumnIndex(columnName) {
 window.onload = () => {
     const page = window.location.pathname.replace('/', '') || 'home';
     navigateToPage(page);
+
+    // Add click event listeners to table headers
+    const headers = document.querySelectorAll('#analysis-table th');
+    headers.forEach((header, index) => {
+        header.addEventListener('click', () => sortTable(index, header));
+    });
 };
+
 
 // Handle page resizing to ensure the border aligns with the buttons
 window.onresize = () => {

@@ -505,7 +505,7 @@ def main():
     # Reorder the columns so RANK is first
     sorted_sos = sorted_sos[['RANK'] + [col for col in sorted_sos.columns if col != 'RANK']]
 
-    sos_df.to_csv('analysis.csv')
+    sorted_sos.to_csv('analysis.csv', index=False)
 
     print(sorted_sos.to_string())
 

@@ -109,5 +109,19 @@ header {
     color: #003366;
 }
 
+/* Add styles for sorting indicators */
+th.ascending::after {
+    content: ' ▲'; /* Up arrow for ascending */
+    font-size: 12px;
+    color: #ffcc00;
+}
+
+th.descending::after {
+    content: ' ▼'; /* Down arrow for descending */
+    font-size: 12px;
+    color: #ffcc00;
+}
+
+
 
 

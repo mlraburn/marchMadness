@@ -30,6 +30,7 @@ def home():
 def analysis():
     try:
         df = pd.read_csv('analysis.csv')
+        df.sort_values(by=['MELO'], ascending=False, inplace=True)
         data_table = df.to_html(classes='table table-striped', index=False)
     except Exception as e:
         data_table = f"<p>Error loading analysis: {str(e)}</p>"
