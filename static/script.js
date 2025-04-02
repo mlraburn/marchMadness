@@ -23,6 +23,11 @@ function navigateToPage(page) {
             const mainContent = tempDiv.querySelector('main'); // Extract only the main content
             if (mainContent) {
                 document.getElementById('content').innerHTML = mainContent.innerHTML;
+
+                // If we navigated to the analysis page, attach the table sorting listeners
+                if (page === 'analysis') {
+                    attachTableSortListeners();
+                }
             } else {
                 console.error('Main content not found in the fetched HTML.');
             }
@@ -47,18 +52,69 @@ function selectButton(button) {
     selectionBorder.style.top = `${buttonTop - 3}px`; // Move 3px up
 }
 
+// Function to sort table
+function sortTable(columnIndex, headerElement) {
+    const table = document.querySelector('.table');
+    const tbody = table.querySelector('tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Check if header already has a sorting class
+    const isAscending = headerElement.classList.contains('ascending');
+
+    // Remove sorting classes from all headers
+    document.querySelectorAll('th').forEach(th => {
+        th.classList.remove('ascending', 'descending');
+    });
+
+    // Add appropriate class to clicked header
+    headerElement.classList.add(isAscending ? 'descending' : 'ascending');
+
+    // Sort the rows
+    rows.sort((rowA, rowB) => {
+        const cellA = rowA.querySelectorAll('td')[columnIndex].textContent;
+        const cellB = rowB.querySelectorAll('td')[columnIndex].textContent;
+
+        // Check if the content is numeric
+        const numA = parseFloat(cellA);
+        const numB = parseFloat(cellB);
+
+        if (!isNaN(numA) && !isNaN(numB)) {
+            // Numeric sorting
+            return isAscending ? numB - numA : numA - numB;
+        } else {
+            // String sorting
+            return isAscending ?
+                cellB.localeCompare(cellA) :
+                cellA.localeCompare(cellB);
+        }
+    });
+
+    // Remove all rows
+    rows.forEach(row => tbody.removeChild(row));
+
+    // Add rows back in sorted order
+    rows.forEach(row => tbody.appendChild(row));
+}
+
 // Handle page load based on the current URL
 window.onload = () => {
     const page = window.location.pathname.replace('/', '') || 'home';
     navigateToPage(page);
 
-    // Add click event listeners to table headers
+    // Add click event listeners to table headers if we're on the analysis page
+    if (page === 'analysis') {
+        attachTableSortListeners();
+    }
+
+};
+
+// Function to attach sort listeners to table headers
+function attachTableSortListeners() {
     const headers = document.querySelectorAll('#analysis-table th');
     headers.forEach((header, index) => {
         header.addEventListener('click', () => sortTable(index, header));
     });
-
-};
+}
 
 
 // Handle page resizing to ensure the border aligns with the buttons
