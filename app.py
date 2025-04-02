@@ -25,7 +25,6 @@ def home():
 
     return render_template('index.html', output=output)
 
-
 @app.route('/analysis')
 def analysis():
     try:
