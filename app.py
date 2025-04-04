@@ -19,6 +19,10 @@ def analysis():
         data_table = f"<p>Error loading analysis: {str(e)}</p>"
     return render_template('analysis.html', table=data_table)
 
+@app.route('/generate-bracket', methods=['GET', 'POST'])
+def generate_bracket():
+    return render_template('simulate.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

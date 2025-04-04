@@ -33,6 +33,28 @@ function navigateToPage(page) {
             }
         })
         .catch(err => console.error('Error loading page:', err));
+
+    // If we navigated to the generate-bracket page, initialize the bracket
+    if (page === 'generate-bracket') {
+        initializeBracket();
+    }
+}
+
+function initializeBracket() {
+    console.log('Initializing bracket...');
+    // This function will be expanded later to load teams, handle simulations, etc.
+
+    // For now, just make sure the IDs are properly set on all cells
+    const teams = document.querySelectorAll('.team');
+    teams.forEach(team => {
+        const teamId = team.id;
+        if (teamId) {
+            const teamNameSpan = team.querySelector('.team-name');
+            if (teamNameSpan) {
+                teamNameSpan.textContent = teamId;
+            }
+        }
+    });
 }
 
 // Function to select a button
@@ -104,6 +126,11 @@ window.onload = () => {
     // Add click event listeners to table headers if we're on the analysis page
     if (page === 'analysis') {
         attachTableSortListeners();
+    }
+
+    // Initialize bracket if we're on the generate-bracket page
+    if (page === 'generate-bracket') {
+        initializeBracket();
     }
 
 };

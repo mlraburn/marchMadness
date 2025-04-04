@@ -142,5 +142,221 @@ th span {
     line-height: 1; /* Line height adjustment for proper alignment */
 }
 
+/* Updated Bracket Styling */
+.bracket-wrapper {
+    display: flex;
+    width: 98%;
+    margin: 0 auto;
+    align-items: stretch;
+    min-height: 800px;
+}
+
+.bracket-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.left-column, .right-column {
+    flex: 2;
+}
+
+.middle-column {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Region styling */
+.region {
+    flex: 1;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.region-title {
+    text-align: center;
+    font-weight: bold;
+    color: #003366;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.region-rounds {
+    display: flex;
+    flex: 1;
+    height: 100%;
+}
+
+/* East and Midwest regions have reversed order */
+.east-region .region-rounds,
+.midwest-region .region-rounds {
+    flex-direction: row-reverse;
+}
+
+/* Game borders should be on the left side for east and midwest regions */
+.east-region .game,
+.midwest-region .game {
+    border-left: 2px solid #003366;
+    border-right: none;
+}
+
+.round {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin: 0 5px;
+}
+
+.round-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #003366;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+/* Game group is a container that helps with vertical spacing */
+.game-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-bottom: 5px;
+}
+
+/* Adjust spacing for Sweet 16 */
+.sweet-sixteen {
+    height: 150px;
+}
+
+/* Adjust spacing for Elite Eight */
+.elite-eight {
+    height: 300px;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    border-left: 2px solid #003366;
+}
+
+/* Reverse border for East and Midwest regions */
+.east-region .game,
+.midwest-region .game {
+    border-left: none;
+    border-right: 2px solid #003366;
+}
+
+.team {
+    display: flex;
+    justify-content: space-between;
+    background-color: #f5f5f5;
+    border: 1px solid #003366;
+    padding: 5px 8px;
+    margin-bottom: 2px;
+    font-size: 12px;
+    width: 120px;
+}
+
+.team-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.team-score {
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+/* Final Four styling */
+.final-four-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    width: 150px;
+}
+
+.semifinal {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.semifinal .game {
+    border: none;
+    width: 100%;
+}
+
+.final-four-logo {
+    width: 100%;
+    height: 60px;
+    background-color: #003366;
+    color: #ffcc00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 18px;
+    margin: 20px 0;
+    border-radius: 10px;
+}
+
+.championship {
+    width: 100%;
+    margin: 20px 0;
+}
+
+.championship .game {
+    border: none;
+}
+
+.middle-column .team {
+    width: 100%;
+}
+
+/* Styling for winning teams */
+.winner {
+    background-color: #ffcc00;
+    color: #003366;
+    font-weight: bold;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1200px) {
+    .team {
+        width: 100px;
+        font-size: 11px;
+    }
+
+    .final-four-container {
+        width: 130px;
+    }
+}
+
+@media (max-width: 900px) {
+    .bracket-wrapper {
+        flex-direction: column;
+    }
+
+    .left-column, .right-column {
+        margin-bottom: 40px;
+    }
+
+    .middle-column {
+        order: -1;
+        margin-bottom: 40px;
+    }
+
+    .final-four-container {
+        width: 80%;
+        max-width: 320px;
+    }
+}
 
 
