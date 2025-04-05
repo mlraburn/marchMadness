@@ -160,12 +160,14 @@ th span {
     flex: 2;
 }
 
+/* Middle column styling - specifically designed to center content */
 .middle-column {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 /* Region styling */
@@ -181,7 +183,7 @@ th span {
     font-weight: bold;
     color: #003366;
     font-size: 18px;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .region-rounds {
@@ -194,13 +196,6 @@ th span {
 .east-region .region-rounds,
 .midwest-region .region-rounds {
     flex-direction: row-reverse;
-}
-
-/* Game borders should be on the left side for east and midwest regions */
-.east-region .game,
-.midwest-region .game {
-    border-left: 2px solid #003366;
-    border-right: none;
 }
 
 .round {
@@ -244,11 +239,11 @@ th span {
     border-left: 2px solid #003366;
 }
 
-/* Reverse border for East and Midwest regions */
+/* Game borders for East and Midwest regions */
 .east-region .game,
 .midwest-region .game {
-    border-left: none;
-    border-right: 2px solid #003366;
+    border-left: 2px solid #003366;
+    border-right: none;
 }
 
 .team {
@@ -273,51 +268,79 @@ th span {
     margin-left: 5px;
 }
 
-/* Final Four styling */
+/* Improved Final Four styling with better centering */
 .final-four-container {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    width: 150px;
+    justify-content: center;
+    height: auto;
+    width: 180px;
+    margin: 0 auto;
+    padding: 10px;
 }
 
 .semifinal {
     width: 100%;
-    margin: 20px 0;
+    margin: 3px 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
 .semifinal .game {
     border: none;
     width: 100%;
+    margin: 0 auto;
 }
 
-.final-four-logo {
+/* Replace the final-four-logo with championship-logo */
+.championship-logo {
     width: 100%;
-    height: 60px;
+    height: 40px;
     background-color: #003366;
     color: #ffcc00;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 18px;
-    margin: 20px 0;
-    border-radius: 10px;
+    font-size: 16px;
+    margin: 3px 0;
+    border-radius: 8px;
+    text-align: center;
+    flex-direction: column;
+    line-height: 1.2;
 }
 
 .championship {
     width: 100%;
-    margin: 20px 0;
+    margin: 3px 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
 }
 
 .championship .game {
     border: none;
+    width: 100%;
+    margin: 0 auto;
 }
 
+/* Championship team cells - make them bigger */
+.championship-team {
+    width: 100%;
+    padding: 8px 10px !important; /* Increased padding */
+    margin-bottom: 2px !important;
+    font-size: 13px !important; /* Larger font */
+    font-weight: 500; /* Slightly bolder */
+}
+
+/* Team styles for middle column */
 .middle-column .team {
     width: 100%;
+    padding: 3px 6px;
+    margin-bottom: 1px;
+    font-size: 11px;
 }
 
 /* Styling for winning teams */
@@ -332,10 +355,6 @@ th span {
     .team {
         width: 100px;
         font-size: 11px;
-    }
-
-    .final-four-container {
-        width: 130px;
     }
 }
 
@@ -358,5 +377,3 @@ th span {
         max-width: 320px;
     }
 }
-
-
