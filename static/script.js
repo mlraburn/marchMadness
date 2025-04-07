@@ -1,5 +1,7 @@
 // Function to handle navigation between "pages"
 function navigateToPage(page) {
+    console.log('Navigating to page:', page);
+
     const selectionBorder = document.getElementById('selection-border');
     const buttons = document.querySelectorAll('.banner button');
     const selectedButton = Array.from(buttons).find(button =>
@@ -24,27 +26,23 @@ function navigateToPage(page) {
             if (mainContent) {
                 document.getElementById('content').innerHTML = mainContent.innerHTML;
 
-                // If we navigated to the analysis page, attach the table sorting listeners
+                // Important: Initialize the page based on its type AFTER the content is loaded
                 if (page === 'analysis') {
                     attachTableSortListeners();
+                } else if (page === 'generate-bracket') {
+                    setTimeout(initializeBracket, 100); // Small delay to ensure DOM is updated
                 }
             } else {
                 console.error('Main content not found in the fetched HTML.');
             }
         })
         .catch(err => console.error('Error loading page:', err));
-
-    // If we navigated to the generate-bracket page, initialize the bracket
-    if (page === 'generate-bracket') {
-        initializeBracket();
-    }
 }
 
 function initializeBracket() {
     console.log('Initializing bracket...');
-    // This function will be expanded later to load teams, handle simulations, etc.
 
-    // For now, just make sure the IDs are properly set on all cells
+    // First make sure teams have IDs
     const teams = document.querySelectorAll('.team');
     teams.forEach(team => {
         const teamId = team.id;
@@ -54,6 +52,25 @@ function initializeBracket() {
                 teamNameSpan.textContent = teamId;
             }
         }
+    });
+
+    // Now attach events to the bracket control buttons - MOVED THIS FROM window.onload
+    console.log('Attaching event listeners to bracket buttons');
+
+    // Use direct binding with simpler approach
+    document.querySelectorAll('.bracket-controls button').forEach(button => {
+        console.log('Found button:', button.id);
+
+        button.addEventListener('click', function(event) {
+            console.log('Button clicked:', this.id);
+
+            // Handle specific button actions
+            if (this.id === 'simulate-bracket-btn') {
+                simulateBracket();
+            } else {
+                alert(this.textContent + ' feature will be implemented soon!');
+            }
+        });
     });
 }
 
@@ -119,6 +136,7 @@ function sortTable(columnIndex, headerElement) {
 }
 
 // Handle page load based on the current URL
+// Handle page load based on the current URL
 window.onload = () => {
     const page = window.location.pathname.replace('/', '') || 'home';
     navigateToPage(page);
@@ -131,8 +149,48 @@ window.onload = () => {
     // Initialize bracket if we're on the generate-bracket page
     if (page === 'generate-bracket') {
         initializeBracket();
-    }
 
+        // Add a direct debug message to verify this code runs
+        console.log('Debug: Attaching event listeners to bracket buttons');
+
+        // Add event listeners for all bracket control buttons with more robust checking
+        const simulateButton = document.getElementById('simulate-bracket-btn');
+        console.log('Debug: Found simulate button:', simulateButton);
+
+        if (simulateButton) {
+            simulateButton.addEventListener('click', function () {
+                console.log('Debug: Simulate button clicked!');
+                simulateBracket();
+            });
+            console.log('Debug: Event listener attached to simulate button');
+        } else {
+            console.error('Error: Could not find simulate-bracket-btn element');
+        }
+
+        const switchBracketButton = document.getElementById('switch-bracket-btn');
+        if (switchBracketButton) {
+            switchBracketButton.addEventListener('click', function () {
+                console.log('Switch bracket clicked');
+                alert('Switch bracket feature will be implemented soon!');
+            });
+        }
+
+        const currentBracketButton = document.getElementById('current-bracket-btn');
+        if (currentBracketButton) {
+            currentBracketButton.addEventListener('click', function () {
+                console.log('Current bracket clicked');
+                alert('Current bracket feature will be implemented soon!');
+            });
+        }
+
+        const saveBracketButton = document.getElementById('save-bracket-btn');
+        if (saveBracketButton) {
+            saveBracketButton.addEventListener('click', function () {
+                console.log('Save bracket clicked');
+                alert('Save bracket feature will be implemented soon!');
+            });
+        }
+    }
 };
 
 // Function to attach sort listeners to table headers
@@ -143,6 +201,61 @@ function attachTableSortListeners() {
     });
 }
 
+// Function to handle simulate bracket button click
+function simulateBracket() {
+    console.log('Debug: simulateBracket function called');
+
+    // Show some visual feedback that simulation is in progress
+    const button = document.getElementById('simulate-bracket-btn');
+
+    if (!button) {
+        console.error('Error: Could not find simulate-bracket-btn in simulateBracket function');
+        alert('Error: Button not found');
+        return;
+    }
+
+    console.log('Debug: Found button, changing text');
+    const originalText = button.textContent;
+    button.textContent = 'Simulating...';
+    button.disabled = true;
+
+    console.log('Debug: Sending fetch request to /simulate-bracket');
+    // Send a POST request to the server
+    fetch('/simulate-bracket', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        // Empty body for now
+        body: JSON.stringify({})
+    })
+    .then(response => {
+        console.log('Debug: Received response', response);
+        return response.json();
+    })
+    .then(data => {
+        console.log('Success:', data);
+        // Reset the button text
+        button.textContent = originalText;
+        button.disabled = false;
+
+        // Display a message to the user
+        alert(data.message);
+
+        // Here you would update the bracket with the simulation results
+        // For now we'll just log it
+        console.log('Would update bracket with simulation results');
+    })
+    .catch(error => {
+        console.error('Error during simulation:', error);
+        // Reset the button text
+        button.textContent = originalText;
+        button.disabled = false;
+
+        // Display error message
+        alert('Error simulating bracket: ' + error);
+    });
+}
 
 // Handle page resizing to ensure the border aligns with the buttons
 window.onresize = () => {
@@ -156,4 +269,6 @@ window.onresize = () => {
     if (selectedButton) {
         selectButton(selectedButton);
     }
+
+
 };
