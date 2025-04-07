@@ -140,57 +140,6 @@ function sortTable(columnIndex, headerElement) {
 window.onload = () => {
     const page = window.location.pathname.replace('/', '') || 'home';
     navigateToPage(page);
-
-    // Add click event listeners to table headers if we're on the analysis page
-    if (page === 'analysis') {
-        attachTableSortListeners();
-    }
-
-    // Initialize bracket if we're on the generate-bracket page
-    if (page === 'generate-bracket') {
-        initializeBracket();
-
-        // Add a direct debug message to verify this code runs
-        console.log('Debug: Attaching event listeners to bracket buttons');
-
-        // Add event listeners for all bracket control buttons with more robust checking
-        const simulateButton = document.getElementById('simulate-bracket-btn');
-        console.log('Debug: Found simulate button:', simulateButton);
-
-        if (simulateButton) {
-            simulateButton.addEventListener('click', function () {
-                console.log('Debug: Simulate button clicked!');
-                simulateBracket();
-            });
-            console.log('Debug: Event listener attached to simulate button');
-        } else {
-            console.error('Error: Could not find simulate-bracket-btn element');
-        }
-
-        const switchBracketButton = document.getElementById('switch-bracket-btn');
-        if (switchBracketButton) {
-            switchBracketButton.addEventListener('click', function () {
-                console.log('Switch bracket clicked');
-                alert('Switch bracket feature will be implemented soon!');
-            });
-        }
-
-        const currentBracketButton = document.getElementById('current-bracket-btn');
-        if (currentBracketButton) {
-            currentBracketButton.addEventListener('click', function () {
-                console.log('Current bracket clicked');
-                alert('Current bracket feature will be implemented soon!');
-            });
-        }
-
-        const saveBracketButton = document.getElementById('save-bracket-btn');
-        if (saveBracketButton) {
-            saveBracketButton.addEventListener('click', function () {
-                console.log('Save bracket clicked');
-                alert('Save bracket feature will be implemented soon!');
-            });
-        }
-    }
 };
 
 // Function to attach sort listeners to table headers
