@@ -206,6 +206,59 @@ function simulateBracket() {
     });
 }
 
+// Function to update the bracket display with the generated bracket data
+// This will be implemented in the future to visually update the bracket
+function updateBracketDisplay(filename) {
+    console.log(`Bracket file generated: ${filename}`);
+    // In the future, we'll fetch the bracket data and update the UI
+    // For now, just log the filename
+}
+
+// Function to generate a new bracket
+function generateBracket() {
+    const statusElement = document.getElementById('bracket-status');
+    const generateButton = document.getElementById('generate-bracket-btn');
+
+    if (statusElement && generateButton) {
+        // Disable the button and show loading message
+        generateButton.disabled = true;
+        statusElement.textContent = 'Generating bracket... This may take a moment.';
+        statusElement.style.color = '#003366';
+
+        // Make a POST request to the server to generate a bracket
+        // Using the /simulate-bracket endpoint instead of /generate-bracket
+        fetch('/simulate-bracket', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    statusElement.textContent = `${data.message} File: ${data.filename}`;
+                    statusElement.style.color = 'green';
+
+                    // Here we could potentially update the bracket display with the new results
+                    // For now, we'll just show the success message
+                    updateBracketDisplay(data.filename);
+
+                } else {
+                    statusElement.textContent = `Error: ${data.message}`;
+                    statusElement.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                statusElement.textContent = `Error: ${error.message}`;
+                statusElement.style.color = 'red';
+            })
+            .finally(() => {
+                // Re-enable the button
+                generateButton.disabled = false;
+            });
+    }
+}
+
 // Handle page resizing to ensure the border aligns with the buttons
 window.onresize = () => {
     const currentPage = window.location.pathname.replace('/', '') || 'home';

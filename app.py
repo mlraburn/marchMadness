@@ -1,5 +1,5 @@
-from flask import Flask, render_template, request
-import subprocess
+from flask import Flask, render_template, request, jsonify
+import MattsMarchMadness
 import pandas as pd
 
 app = Flask(__name__)
@@ -22,6 +22,25 @@ def analysis():
 @app.route('/generate-bracket', methods=['GET', 'POST'])
 def generate_bracket():
     return render_template('simulate.html')
+
+
+@app.route('/simulate-bracket', methods=['POST'])
+def simulate_bracket():
+    try:
+        # Call the new function to generate a bracket
+        generated_file = MattsMarchMadness.generate_web_bracket()
+
+        # Return the result as JSON
+        return jsonify({
+            'status': 'success',
+            'filename': generated_file,
+            'message': 'Bracket simulation completed successfully!'
+        })
+    except Exception as e:
+        return jsonify({
+            'status': 'error',
+            'message': str(e)
+        })
 
 
 if __name__ == '__main__':

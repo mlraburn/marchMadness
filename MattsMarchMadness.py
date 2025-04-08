@@ -5,13 +5,14 @@ import dataDownLoad
 import bracket
 import csv
 import sys  # base python
+import datetime
 
 from marchMadness.bracket import elo_prob
 
-sd_raw = pandas.read_excel("03-16-2024-cbb-season-team-feed.xlsx")
+sd_raw = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")
 sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
 
-td = pandas.read_csv('marchMadTable_2024.csv')
+td = pandas.read_csv('marchMadTable_2025.csv')
 nsd = pandas.read_csv('NSData.csv')
 
 
@@ -265,6 +266,47 @@ def main():
 
 def amount_of_games(rnd) -> int:
     return int(8 * ((1 / 2) ** (rnd - 1)))
+
+
+def generate_web_bracket():
+    """
+    Function called by the web interface to generate a new bracket.
+    Returns the filename of the generated bracket CSV.
+    """
+    try:
+        # Read the current bracket count from config
+        config = open('config.csv')
+        config_data = config.readlines()
+        brackets_made = int(config_data[0])
+        config.close()
+
+        # Generate a unique timestamp for the bracket
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
+
+        # Create a new bracket serial number
+        bracket_serial = brackets_made + 1
+
+        # Create the filename
+        name_of_file = f"MMM__{bracket_serial}_{timestamp}.csv"
+
+        # Simulate the bracket
+        tourney_final_df = simulate_mm()
+
+        # Save the bracket to a CSV file
+        tourney_final_df.to_csv(name_of_file, index=False)
+
+        # Update the config file with the new bracket count
+        config = open('config.csv', 'w')
+        writer = csv.writer(config)
+        writer.writerow([bracket_serial])
+        config.close()
+
+        # Return the filename for potential use by the web interface
+        return name_of_file
+
+    except Exception as e:
+        print(f"Error generating bracket: {str(e)}")
+        return None
 
 
 if __name__ == '__main__':
