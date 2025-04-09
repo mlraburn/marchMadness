@@ -42,6 +42,14 @@ def simulate_bracket():
             'message': str(e)
         })
 
+@app.route('/static/<path:filename>')
+def serve_file(filename):
+    """Serve generated CSV files"""
+    if filename.endswith('.csv') and filename.startswith('MMM__'):
+        # Check if file exists in root directory
+        if os.path.isfile(filename):
+            return send_file(filename, as_attachment=False)
+    return "File not found", 404
 
 if __name__ == '__main__':
     app.run(debug=True)

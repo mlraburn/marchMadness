@@ -287,7 +287,7 @@ def generate_web_bracket():
         bracket_serial = brackets_made + 1
 
         # Create the filename
-        name_of_file = f"MMM__{bracket_serial}_{timestamp}.csv"
+        name_of_file = f"/marchMadness/static/MMM__{bracket_serial}_{timestamp}.csv"
 
         # Simulate the bracket
         tourney_final_df = simulate_mm()
