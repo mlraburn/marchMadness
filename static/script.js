@@ -150,7 +150,7 @@ function attachTableSortListeners() {
     });
 }
 
-// Function to handle simulate bracket button click
+// In script.js, modify the simulateBracket function:
 function simulateBracket() {
     console.log('Debug: simulateBracket function called');
 
@@ -191,9 +191,10 @@ function simulateBracket() {
         // Display a message to the user
         alert(data.message);
 
-        // Here you would update the bracket with the simulation results
-        // For now we'll just log it
-        console.log('Would update bracket with simulation results');
+        // Call updateBracketDisplay with the filename from the response
+        if (data.status === 'success' && data.filename) {
+            updateBracketDisplay(data.filename);
+        }
     })
     .catch(error => {
         console.error('Error during simulation:', error);
@@ -210,8 +211,11 @@ function simulateBracket() {
 function updateBracketDisplay(filename) {
     console.log(`Bracket file generated: ${filename}`);
 
+    // Extract just the filename portion if it includes a path
+    const filenameOnly = filename.split('/').pop();
+
     // Fetch the CSV data
-    fetch(`/static/${filename}`)
+    fetch(`/static/${filenameOnly}`)
         .then(response => {
             if (!response.ok) {
                 throw new Error(`Failed to load bracket data: ${response.status} ${response.statusText}`);
@@ -219,19 +223,32 @@ function updateBracketDisplay(filename) {
             return response.text();
         })
         .then(csvData => {
-            // Parse the CSV data
-            const bracketData = parseCSV(csvData);
+    console.log('Raw CSV data:', csvData.substring(0, 500) + '...'); // Show first 500 chars of CSV
 
-            // Update the UI with the parsed data
-            populateBracket(bracketData);
-        })
+    // Parse the CSV data
+    const bracketData = parseCSV(csvData);
+    console.log('Parsed bracket data (first 5 entries):', bracketData.slice(0, 5));
+
+    // Check if we have the expected data structure
+    if (bracketData.length > 0) {
+        const firstEntry = bracketData[0];
+        if (!firstEntry.TEAM_NAME || !firstEntry.REGION || !firstEntry.ROUND) {
+            console.error('CSV data structure is unexpected:', firstEntry);
+            alert('Error: Bracket data format is not as expected');
+            return;
+        }
+    } else {
+        console.error('No data found in CSV');
+        alert('Error: No data found in bracket file');
+        return;
+    }
+
+    // Update the UI with the parsed data
+    populateBracket(bracketData);
+})
         .catch(error => {
             console.error('Error updating bracket display:', error);
-            const statusElement = document.getElementById('bracket-status');
-            if (statusElement) {
-                statusElement.textContent = `Error updating bracket: ${error.message}`;
-                statusElement.style.color = 'red';
-            }
+            alert(`Error updating bracket: ${error.message}`);
         });
 }
 
@@ -246,12 +263,37 @@ function parseCSV(csvData) {
 
     // Process each data row
     for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(',');
-        const entry = {};
+        // Handle possible quoted fields with commas inside them
+        let values = [];
+        let currentValue = '';
+        let inQuotes = false;
+
+        // Simple CSV parsing
+        const row = lines[i];
+        for (let j = 0; j < row.length; j++) {
+            const char = row[j];
+
+            if (char === '"' && (j === 0 || row[j-1] !== '\\')) {
+                inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+                values.push(currentValue);
+                currentValue = '';
+            } else {
+                currentValue += char;
+            }
+        }
+        // Add the last value
+        values.push(currentValue);
 
         // Map values to headers
+        const entry = {};
         for (let j = 0; j < headers.length; j++) {
-            entry[headers[j]] = values[j];
+            // Remove quotes if present
+            let value = values[j] || '';
+            if (value.startsWith('"') && value.endsWith('"')) {
+                value = value.substring(1, value.length - 1);
+            }
+            entry[headers[j]] = value;
         }
 
         result.push(entry);
@@ -262,77 +304,96 @@ function parseCSV(csvData) {
 
 // Function to populate the bracket with team data
 function populateBracket(bracketData) {
+    console.log('Starting to populate bracket with data:', bracketData);
+
     // Create a mapping of team positions in the bracket
     const teamMapping = {};
 
     // Process each team in the data
     bracketData.forEach(team => {
+        console.log('Processing team entry:', team);
+
+        // Extract values, ensure they're properly converted from strings
         const teamName = team.TEAM_NAME;
         const region = team.REGION;
         const round = parseInt(team.ROUND);
         const seed = parseInt(team.SEED);
         const orderInRegion = parseInt(team.ORDER_IN_REGION);
 
+        console.log(`Team: ${teamName}, Region: ${region}, Round: ${round}, Seed: ${seed}, Order: ${orderInRegion}`);
+
         // First round (initial seeding)
         if (round === 1) {
             // Format: region:round:seed
             const cellId = `${region.charAt(0)}:1:${seed}`;
+            console.log(`Round 1: Mapping ${cellId} to ${teamName}`);
             teamMapping[cellId] = teamName;
         }
 
-        // Handle subsequent rounds within regions (2-5)
-        if (round > 1 && round <= 5) {
-            // For rounds 2-5, we need to find the corresponding cell ID
-            // Based on the region and the position in the round
-            const roundPosition = calculateRoundPosition(region, round, orderInRegion);
-            const cellId = `${region.charAt(0)}:${round}:${roundPosition}`;
+        // Update the relevant part of the populateBracket function:
+
+        // Handle subsequent rounds (2-5)
+        else if (round > 1 && round <= 5) {
+            // For rounds 2-5, we need a smarter approach to determine position
+            // Each round has fewer spots (8, 4, 2, 1)
+            const positionInRound = Math.ceil(orderInRegion / (2 ** (round - 1)));
+            const cellId = `${region.charAt(0)}:${round}:${positionInRound}`;
+            console.log(`Round ${round}: Mapping ${cellId} to ${teamName} (order: ${orderInRegion}, position: ${positionInRound})`);
             teamMapping[cellId] = teamName;
         }
 
         // Handle Final Four (round 6)
-        if (round === 6) {
-            // Determine which semifinal the team is in based on region
-            if (region === 'SOUTH' || region === 'WEST') {
-                // South-West semifinal
-                if (region === 'SOUTH') {
-                    teamMapping['S-W:S'] = teamName;
-                } else {
-                    teamMapping['S-W:W'] = teamName;
-                }
-            } else {
-                // East-Midwest semifinal
-                if (region === 'EAST') {
-                    teamMapping['E-M:E'] = teamName;
-                } else {
-                    teamMapping['E-M:M'] = teamName;
-                }
+        else if (round === 6) {
+            // Determine semifinal position based on region
+            if (region === 'SOUTH') {
+                teamMapping['S-W:S'] = teamName;
+                console.log(`Final Four: Mapping S-W:S to ${teamName} (South)`);
+            }
+            else if (region === 'WEST') {
+                teamMapping['S-W:W'] = teamName;
+                console.log(`Final Four: Mapping S-W:W to ${teamName} (West)`);
+            }
+            else if (region === 'EAST') {
+                teamMapping['E-M:E'] = teamName;
+                console.log(`Final Four: Mapping E-M:E to ${teamName} (East)`);
+            }
+            else if (region === 'MIDWEST') {
+                teamMapping['E-M:M'] = teamName;
+                console.log(`Final Four: Mapping E-M:M to ${teamName} (Midwest)`);
             }
         }
 
         // Handle Championship (round 7)
-        if (round === 7) {
-            // Determine which side of the bracket the team came from
+        else if (round === 7) {
+            // Map to championship game position
             if (region === 'SOUTH' || region === 'WEST') {
                 teamMapping['S-W'] = teamName;
+                console.log(`Championship: Mapping S-W to ${teamName}`);
             } else {
                 teamMapping['E-M'] = teamName;
+                console.log(`Championship: Mapping E-M to ${teamName}`);
             }
         }
 
         // Handle Champion (round 8)
-        if (round === 8) {
-            // Mark the champion with a special class
+        else if (round === 8) {
             const championId = (region === 'SOUTH' || region === 'WEST') ? 'S-W' : 'E-M';
+            console.log(`Champion: ${teamName} (${region}) - Adding winner class to ${championId}`);
 
+            // Mark as winner with a small delay
             setTimeout(() => {
-                // Add winner class to the champion
                 const championElement = document.getElementById(championId);
                 if (championElement) {
                     championElement.classList.add('winner');
+                    console.log(`Added winner class to ${championId}`);
+                } else {
+                    console.error(`Could not find champion element with ID ${championId}`);
                 }
-            }, 100); // Small delay to ensure the DOM is updated
+            }, 100);
         }
     });
+
+    console.log('Final team mapping:', teamMapping);
 
     // Update the bracket with team names
     for (const [cellId, teamName] of Object.entries(teamMapping)) {
@@ -340,7 +401,10 @@ function populateBracket(bracketData) {
         if (cell) {
             const teamNameSpan = cell.querySelector('.team-name');
             if (teamNameSpan) {
+                console.log(`Setting ${cellId} team name to ${teamName}`);
                 teamNameSpan.textContent = teamName;
+            } else {
+                console.error(`Could not find .team-name span in cell ${cellId}`);
             }
 
             // Add seed to team name
@@ -354,28 +418,31 @@ function populateBracket(bracketData) {
                 seedSpan.style.color = '#666';
 
                 // Insert seed before team name
-                if (teamNameSpan.parentNode) {
+                if (teamNameSpan && teamNameSpan.parentNode) {
                     teamNameSpan.parentNode.insertBefore(seedSpan, teamNameSpan);
+                    console.log(`Added seed ${teamData.SEED} to ${cellId}`);
                 }
             }
+        } else {
+            console.error(`Could not find cell with ID ${cellId}`);
         }
     }
 }
 
-// Helper function to calculate position in a round
-function calculateRoundPosition(region, round, orderInRegion) {
-    // In round 2, teams are numbered 1-8
-    // In round 3, teams are numbered 1-4
-    // In round 4, teams are numbered 1-2
-    // In round 5, there's only one winner per region
+// Replace the calculateRoundPosition function with this simpler approach:
+function calculateRoundPosition(round, orderInRegion) {
+    // In the current bracket structure, positions in each round follow a pattern:
+    // Round 1: 16 teams (positions 1-16)
+    // Round 2: 8 teams (positions 1-8)
+    // Round 3: 4 teams (positions 1-4)
+    // Round 4: 2 teams (positions 1-2)
+    // Round 5: 1 team (position 1)
 
-    // For simplicity, just return the position as is
-    // This will need to be adjusted based on the actual bracket structure
-    if (round === 5) return 1; // Only one winner per region
+    // For rounds 2-5, we'll map orderInRegion to the appropriate position
+    const totalPositionsInRound = 16 / (2 ** (round - 1));
 
-    // For rounds 2-4, the position depends on the orderInRegion
-    // This is a simplified approach and might need adjustments
-    return Math.ceil(orderInRegion / (2 ** (round - 2)));
+    // Make sure we don't exceed the number of positions in this round
+    return Math.min(orderInRegion, totalPositionsInRound);
 }
 
 // Function to generate a new bracket

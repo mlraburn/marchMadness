@@ -1,13 +1,16 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 import MattsMarchMadness
 import pandas as pd
+import os
 
 app = Flask(__name__)
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
     return render_template('home.html')
+
 
 @app.route('/analysis')
 def analysis():
@@ -18,6 +21,7 @@ def analysis():
     except Exception as e:
         data_table = f"<p>Error loading analysis: {str(e)}</p>"
     return render_template('analysis.html', table=data_table)
+
 
 @app.route('/generate-bracket', methods=['GET', 'POST'])
 def generate_bracket():
@@ -42,14 +46,21 @@ def simulate_bracket():
             'message': str(e)
         })
 
+
 @app.route('/static/<path:filename>')
 def serve_file(filename):
     """Serve generated CSV files"""
-    if filename.endswith('.csv') and filename.startswith('MMM__'):
-        # Check if file exists in root directory
-        if os.path.isfile(filename):
-            return send_file(filename, as_attachment=False)
-    return "File not found", 404
+    try:
+        if filename.endswith('.csv') and filename.startswith('MMM__'):
+            # Try to serve from static directory
+            filepath = os.path.join('static', filename)
+            if os.path.isfile(filepath):
+                return send_file(filepath, as_attachment=False)
+        # Let Flask handle normal static files
+        return app.send_static_file(filename)
+    except Exception as e:
+        return f"Error serving file: {str(e)}", 404
+
 
 if __name__ == '__main__':
     app.run(debug=True)
