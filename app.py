@@ -51,14 +51,28 @@ def simulate_bracket():
 def serve_file(filename):
     """Serve generated CSV files"""
     try:
+        print(f"Request for file: {filename}")
+
         if filename.endswith('.csv') and filename.startswith('MMM__'):
             # Try to serve from static directory
             filepath = os.path.join('static', filename)
+            print(f"Looking for file at: {filepath}")
+
             if os.path.isfile(filepath):
-                return send_file(filepath, as_attachment=False)
+                print(f"File found, returning: {filepath}")
+                return send_file(filepath, as_attachment=False, mimetype='text/csv')
+            else:
+                print(f"File not found at: {filepath}")
+                # Try root directory as fallback
+                if os.path.isfile(filename):
+                    print(f"File found in root: {filename}")
+                    return send_file(filename, as_attachment=False, mimetype='text/csv')
+
         # Let Flask handle normal static files
+        print(f"Delegating to default static file handler")
         return app.send_static_file(filename)
     except Exception as e:
+        print(f"Error serving file: {str(e)}")
         return f"Error serving file: {str(e)}", 404
 
 
