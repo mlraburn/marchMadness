@@ -7,8 +7,6 @@ import csv
 import sys  # base python
 import datetime
 
-from marchMadness.bracket import elo_prob
-
 sd_raw = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")
 sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
 

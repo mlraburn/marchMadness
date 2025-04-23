@@ -25,8 +25,8 @@ schedule_dataframe: pandas.DataFrame = schedule_dataframe_raw[['GAME-ID', 'TEAM'
 # marchMadness table is set manually
 tournament_dataframe: pandas.DataFrame = pandas.read_csv('marchMadTable_2025.csv')
 
-# load Nate Silvers Data
-nate_silver_data: pandas.DataFrame = pandas.read_csv('nate-silver-data-baysian-elo.csv')
+# load NS data
+other_data_N: pandas.DataFrame = pandas.read_csv('other-data.csv')
 
 
 def get_game(game_id: int) -> pandas.DataFrame:
@@ -245,12 +245,12 @@ def get_nate_silver_grade(team: str) -> float:
     :return: Nate Silver's Team Grade (0 - 100) 100 is better
     """
 
-    return nate_silver_data[nate_silver_data['Team'] == team]['Current Elo'].iloc[0]
+    return other_data_N[other_data_N['Team'] == team]['Current Elo'].iloc[0]
     # seed = get_seed(team)
     # region = get_region(team)
     # region = all_caps_to_capital_first(region)  # Nate's region is a bit different
 
-    # return nate_silver_data[(nate_silver_data['SEED'] == seed) & (nate_silver_data['REGION'] == region)]['NSGRADE'].iloc[0]
+    # return other_data_N[(other_data_N['SEED'] == seed) & (other_data_N['REGION'] == region)]['NSGRADE'].iloc[0]
 
 
 def win_loss_difference_strength_of_schedule(win: int, loss: int, strength_of_schedule: float) -> float:
