@@ -21,6 +21,7 @@ COPY analysis.csv .
 COPY config.csv .
 COPY 03-16-2025-cbb-season-team-feed.xlsx .
 COPY marchMadTable_2025.csv .
+COPY other-data.csv .
 
 # copy templates and static files for the web
 

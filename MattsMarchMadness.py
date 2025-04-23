@@ -11,7 +11,6 @@ sd_raw = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")
 sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
 
 td = pandas.read_csv('marchMadTable_2025.csv')
-nsd = pandas.read_csv('NSData.csv')
 
 
 def create_analysis_df() -> pandas.DataFrame:
