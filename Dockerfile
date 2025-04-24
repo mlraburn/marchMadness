@@ -28,13 +28,18 @@ COPY other-data.csv .
 COPY templates ./templates/
 COPY static/ ./static/
 
-# Make port 5000 available
-EXPOSE 5000
+# create static directory for simulation brackets
+RUN mkdir -p /app/static
 
-# ENV variables
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+# allow app to be able to write generated files
+RUN chmod -R 777 /app
 
-# Run the Flask Application when container launches
-CMD ["flask", "run"]
+# make port environmental variable
+ENV PORT=8080
+
+# Expose Port
+EXPOSE $PORT
+
+# run the flask app when container launches
+CMD exec gunicorn --bind :$PORT --workers 1 --threads 8 --timeout 0 app:app
 
