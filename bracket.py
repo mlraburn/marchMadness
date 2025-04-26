@@ -152,6 +152,6 @@ def elo_prob(top_melo, bottom_melo) -> float:
     # adjusted to 0.07256*X + 53.23
     prob_to_win = (.07256 * dif_elo) + 53.23
     if prob_to_win >= 100:
-        return 98.7
+        return 98.7 # maybe check the calibration
     else:
         return prob_to_win
