@@ -534,6 +534,10 @@ function populateBracket(bracketData) {
     for (const [cellId, teamName] of Object.entries(teamMapping)) {
         const cell = document.getElementById(cellId);
         if (cell) {
+            // First, clear any existing team-seed spans to prevent duplicates
+            const existingSeedSpans = cell.querySelectorAll('.team-seed');
+            existingSeedSpans.forEach(span => span.remove());
+
             const teamNameSpan = cell.querySelector('.team-name');
             if (teamNameSpan) {
                 console.log(`Setting ${cellId} team name to ${teamName}`);
