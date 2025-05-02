@@ -42,19 +42,10 @@ function navigateToPage(page) {
 function initializeBracket() {
     console.log('Initializing bracket...');
 
-    // First make sure teams have IDs
-    const teams = document.querySelectorAll('.team');
-    teams.forEach(team => {
-        const teamId = team.id;
-        if (teamId) {
-            const teamNameSpan = team.querySelector('.team-name');
-            if (teamNameSpan) {
-                teamNameSpan.textContent = teamId;
-            }
-        }
-    });
+    // First, try to load the live bracket data
+    loadLiveBracket();
 
-    // Now attach events to the bracket control buttons - MOVED THIS FROM window.onload
+    // Now attach events to the bracket control buttons
     console.log('Attaching event listeners to bracket buttons');
 
     // Use direct binding with simpler approach
@@ -67,10 +58,84 @@ function initializeBracket() {
             // Handle specific button actions
             if (this.id === 'simulate-bracket-btn') {
                 simulateBracket();
+            } else if (this.id === 'current-bracket-btn') {
+                loadLiveBracket();
             } else {
                 alert(this.textContent + ' feature will be implemented soon!');
             }
         });
+    });
+}
+
+// New function to load the live bracket data
+function loadLiveBracket() {
+    console.log('Loading live bracket data from Google Cloud Storage bucket');
+
+    // Show some visual feedback that loading is in progress
+    const statusElement = document.getElementById('bracket-status');
+    if (statusElement) {
+        statusElement.textContent = 'Loading current tournament status from Cloud Storage...';
+        statusElement.style.color = '#003366';
+    }
+
+    // Fetch the live bracket CSV file
+    fetch('/static/mens-live.csv')
+        .then(response => {
+            console.log('Live bracket fetch response:', response);
+            if (!response.ok) {
+                throw new Error(`Failed to load live bracket data: ${response.status} ${response.statusText}`);
+            }
+            return response.text();
+        })
+        .then(csvData => {
+            console.log('CSV data loaded, length:', csvData.length);
+
+            // Parse the CSV data
+            const bracketData = parseCSV(csvData);
+
+            // Validate the parsed data
+            if (!bracketData || bracketData.length === 0) {
+                throw new Error('No valid entries found in live bracket data');
+            }
+
+            // Update the UI with the parsed data
+            populateBracket(bracketData, true); // true flag indicates this is live data
+
+            if (statusElement) {
+                statusElement.textContent = 'Current tournament bracket loaded successfully';
+                statusElement.style.color = 'green';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading live bracket:', error);
+            if (statusElement) {
+                statusElement.textContent = `Error loading current bracket: ${error.message}. Make sure the mens-live.csv file exists in your Cloud Storage bucket.`;
+                statusElement.style.color = 'red';
+            }
+
+            // Initialize empty bracket as fallback
+            initializeEmptyBracket();
+        });
+}
+
+// Function to initialize an empty bracket with team IDs
+function initializeEmptyBracket() {
+    console.log('Initializing empty bracket with cell IDs');
+
+    // Get all team cells
+    const teams = document.querySelectorAll('.team');
+    teams.forEach(team => {
+        const teamId = team.id;
+        if (teamId) {
+            const teamNameSpan = team.querySelector('.team-name');
+            if (teamNameSpan) {
+                teamNameSpan.textContent = teamId;
+            }
+
+            // Remove any existing seed spans
+            const existingSeedSpans = team.querySelectorAll('.team-seed');
+            existingSeedSpans.forEach(span => span.remove());
+        }
     });
 }
 
@@ -349,11 +414,13 @@ function parseCSV(csvData) {
 }
 
 // Function to populate the bracket with team data
-function populateBracket(bracketData) {
+function populateBracket(bracketData, isLiveData = false) {
     console.log('Starting to populate bracket with data:', bracketData);
 
     // Create a mapping of team positions in the bracket
     const teamMapping = {};
+    const rounds = [1, 2, 3, 4, 5, 6, 7]; // All possible rounds
+    const regions = ['SOUTH', 'WEST', 'EAST', 'MIDWEST'];
 
     // Process each team in the data
     bracketData.forEach(team => {
@@ -380,17 +447,7 @@ function populateBracket(bracketData) {
         else if (round > 1 && round <= 4) {
             // For second round
             if (round === 2) {
-                // In NCAA brackets, the second round positions are fixed based on the matchups:
-                // Position 1: winner of 1 vs 16
-                // Position 2: winner of 8 vs 9
-                // Position 3: winner of 5 vs 12
-                // Position 4: winner of 4 vs 13
-                // Position 5: winner of 6 vs 11
-                // Position 6: winner of 3 vs 14
-                // Position 7: winner of 7 vs 10
-                // Position 8: winner of 2 vs 15
-
-                // Let's use the seed to determine the position in round 2
+                // In NCAA brackets, the second round positions are fixed based on the matchups
                 let position;
 
                 // Check if the team came from a specific matchup
@@ -421,12 +478,6 @@ function populateBracket(bracketData) {
             }
             // For round 3 (Sweet 16), use a similar explicit mapping
             else if (round === 3) {
-                // In Sweet 16, positions should correspond to specific regions of the bracket
-                // Position 1: Winner of the 1/16 vs 8/9 game
-                // Position 4: Winner of the 5/12 vs 4/13 game
-                // Position 3: Winner of the 6/11 vs 3/14 game
-                // Position 2: Winner of the 7/10 vs 2/15 game
-
                 let position;
 
                 // Map based on seed and region pattern
@@ -449,10 +500,6 @@ function populateBracket(bracketData) {
             }
             // For round 4 (Elite 8), map explicitly
             else if (round === 4) {
-                // In Elite 8, there are only 2 positions per region
-                // Position 1: Winner of positions 1 vs 4 from Sweet 16
-                // Position 2: Winner of positions 3 vs 2 from Sweet 16
-
                 let position;
 
                 // Map based on seed
@@ -530,8 +577,44 @@ function populateBracket(bracketData) {
 
     console.log('Final team mapping:', teamMapping);
 
+    // Create a map of all possible cell IDs to handle TBD cases
+    const allCellIds = new Set();
+
+    // First round cells (16 teams per region)
+    regions.forEach(region => {
+        const regionChar = region.charAt(0);
+        for (let seed = 1; seed <= 16; seed++) {
+            allCellIds.add(`${regionChar}:1:${seed}`);
+        }
+
+        // Second round (8 teams per region)
+        for (let pos = 1; pos <= 8; pos++) {
+            allCellIds.add(`${regionChar}:2:${pos}`);
+        }
+
+        // Sweet 16 (4 teams per region)
+        for (let pos = 1; pos <= 4; pos++) {
+            allCellIds.add(`${regionChar}:3:${pos}`);
+        }
+
+        // Elite 8 (2 teams per region)
+        for (let pos = 1; pos <= 2; pos++) {
+            allCellIds.add(`${regionChar}:4:${pos}`);
+        }
+    });
+
+    // Final Four cells
+    allCellIds.add('S-W:S');
+    allCellIds.add('S-W:W');
+    allCellIds.add('E-M:E');
+    allCellIds.add('E-M:M');
+
+    // Championship cells
+    allCellIds.add('S-W');
+    allCellIds.add('E-M');
+
     // Update the bracket with team names
-    for (const [cellId, teamName] of Object.entries(teamMapping)) {
+    allCellIds.forEach(cellId => {
         const cell = document.getElementById(cellId);
         if (cell) {
             // First, clear any existing team-seed spans to prevent duplicates
@@ -540,32 +623,43 @@ function populateBracket(bracketData) {
 
             const teamNameSpan = cell.querySelector('.team-name');
             if (teamNameSpan) {
-                console.log(`Setting ${cellId} team name to ${teamName}`);
-                teamNameSpan.textContent = teamName;
+                if (teamMapping[cellId]) {
+                    // We have data for this cell
+                    console.log(`Setting ${cellId} team name to ${teamMapping[cellId]}`);
+                    teamNameSpan.textContent = teamMapping[cellId];
+
+                    // Find team data to get the seed
+                    const teamData = bracketData.find(team => team.TEAM_NAME === teamMapping[cellId]);
+                    if (teamData) {
+                        const seedSpan = document.createElement('span');
+                        seedSpan.className = 'team-seed';
+                        seedSpan.textContent = teamData.SEED;
+                        seedSpan.style.marginRight = '5px';
+                        seedSpan.style.fontSize = '10px';
+                        seedSpan.style.color = '#666';
+
+                        // Insert seed before team name
+                        if (teamNameSpan && teamNameSpan.parentNode) {
+                            teamNameSpan.parentNode.insertBefore(seedSpan, teamNameSpan);
+                            console.log(`Added seed ${teamData.SEED} to ${cellId}`);
+                        }
+                    }
+                } else if (isLiveData) {
+                    // For live data, use TBD for future games
+                    console.log(`Setting ${cellId} team name to TBD (future game)`);
+                    teamNameSpan.textContent = "TBD";
+                } else {
+                    // For simulated brackets, show cell ID
+                    console.log(`Setting ${cellId} team name to the cell ID`);
+                    teamNameSpan.textContent = cellId;
+                }
             } else {
                 console.error(`Could not find .team-name span in cell ${cellId}`);
-            }
-
-            // Add seed to team name
-            const teamData = bracketData.find(team => team.TEAM_NAME === teamName);
-            if (teamData) {
-                const seedSpan = document.createElement('span');
-                seedSpan.className = 'team-seed';
-                seedSpan.textContent = teamData.SEED;
-                seedSpan.style.marginRight = '5px';
-                seedSpan.style.fontSize = '10px';
-                seedSpan.style.color = '#666';
-
-                // Insert seed before team name
-                if (teamNameSpan && teamNameSpan.parentNode) {
-                    teamNameSpan.parentNode.insertBefore(seedSpan, teamNameSpan);
-                    console.log(`Added seed ${teamData.SEED} to ${cellId}`);
-                }
             }
         } else {
             console.error(`Could not find cell with ID ${cellId}`);
         }
-    }
+    });
 }
 
 // Function to generate a new bracket
