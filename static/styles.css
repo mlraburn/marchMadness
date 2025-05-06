@@ -1,10 +1,23 @@
+/* ==========================================================================
+   1. CSS Variables / Design Tokens
+   ========================================================================== */
+:root {
+    --primary-color: #003366;  /* Dark blue */
+    --accent-color: #ffcc00;   /* Bright yellow */
+    --background-color: #f0f8ff; /* Light blue background */
+    --font-family: Arial, sans-serif;
+}
+
+/* ==========================================================================
+   2. Base/Reset Styles
+   ========================================================================== */
 html {
     overflow-y: scroll; /* Forces the vertical scrollbar to always be present */
 }
 
 /* Body styling */
 body {
-    font-family: Arial, sans-serif;
+    font-family: var(--font-family);
     margin: 0;
     padding: 0;
     background-color: #f0f8ff; /* Light blue background */
