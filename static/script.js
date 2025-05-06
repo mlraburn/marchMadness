@@ -150,10 +150,10 @@ function selectButton(button) {
     const buttonTop = button.offsetTop;
 
     // Set selection border dimensions slightly larger than the button
-    selectionBorder.style.width = `${buttonWidth + 10}px`; // 10px wider
-    selectionBorder.style.height = `${buttonHeight + 6}px`; // 6px taller
-    selectionBorder.style.left = `${buttonLeft - 5}px`; // Move 5px left
-    selectionBorder.style.top = `${buttonTop - 3}px`; // Move 3px up
+    selectionBorder.style.width = `${buttonWidth}px`; // 10px wider
+    selectionBorder.style.height = `${buttonHeight}px`; // 6px taller
+    selectionBorder.style.left = `${buttonLeft}px`; // Move 5px left
+    selectionBorder.style.top = `${buttonTop}px`; // Move 3px up
 }
 
 // Function to sort table

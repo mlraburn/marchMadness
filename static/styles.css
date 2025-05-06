@@ -65,11 +65,11 @@ header {
 /* Selection border styling */
 .selection-border {
     position: absolute;
-    border: 2px solid #ffcc00; /* Bright yellow border */
+    border: 3px solid #ffcc00; /* Bright yellow border */
     border-radius: 10px; /* Matches the buttons' corner radius */
     box-sizing: border-box; /* Includes the border in the dimensions */
     transition: left 0.5s ease, top 0.5s ease, width 0.5s ease, height 0.5s ease; /* Smooth animations */
-    z-index: 0;
+    z-index: 2;
 }
 
 /* Table container styling */
