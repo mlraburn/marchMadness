@@ -560,6 +560,10 @@ function populateBracket(bracketData, isLiveData = false) {
         // Handle Champion (round 7)
         else if (round === 7) {
             const championId = (region === 'SOUTH' || region === 'WEST') ? 'S-W' : 'E-M';
+            let championLoserId = 'S-W'
+            if (championId === 'S-W') {
+                championLoserId = 'E-M'
+            }
             console.log(`Champion: ${teamName} (${region}) - Adding winner class to ${championId}`);
 
             // Mark as winner with a small delay
@@ -570,6 +574,12 @@ function populateBracket(bracketData, isLiveData = false) {
                     console.log(`Added winner class to ${championId}`);
                 } else {
                     console.error(`Could not find champion element with ID ${championId}`);
+                }
+                const championLoserElement = document.getElementById(championLoserId);
+                if (championLoserElement) {
+                    championLoserElement.classList.remove('winner');
+                } else {
+                    console.error(`Could not find loser champion element with id ${championLoserId}`);
                 }
             }, 100);
         }
