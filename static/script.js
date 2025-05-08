@@ -570,14 +570,14 @@ function populateBracket(bracketData, isLiveData = false) {
             setTimeout(() => {
                 const championElement = document.getElementById(championId);
                 if (championElement) {
-                    championElement.classList.add('winner');
+                    championElement.classList.add('winner');  // add winner tag to win
                     console.log(`Added winner class to ${championId}`);
                 } else {
                     console.error(`Could not find champion element with ID ${championId}`);
                 }
                 const championLoserElement = document.getElementById(championLoserId);
                 if (championLoserElement) {
-                    championLoserElement.classList.remove('winner');
+                    championLoserElement.classList.remove('winner'); // take out the winner if they didn't win
                 } else {
                     console.error(`Could not find loser champion element with id ${championLoserId}`);
                 }
