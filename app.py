@@ -23,7 +23,7 @@ os.makedirs('static', exist_ok=True)
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/home', methods=['GET', 'POST'])
 def home():
-    return render_template('home.html')
+    return render_template('simulate.html')
 
 
 @app.route('/analysis')
@@ -35,11 +35,6 @@ def analysis():
     except Exception as e:
         data_table = f"<p>Error loading analysis: {str(e)}</p>"
     return render_template('analysis.html', table=data_table)
-
-
-@app.route('/generate-bracket', methods=['GET', 'POST'])
-def generate_bracket():
-    return render_template('simulate.html')
 
 
 @app.route('/simulate-bracket', methods=['POST'])
