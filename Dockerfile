@@ -5,22 +5,22 @@ LABEL authors="MLR"
 WORKDIR /app
 
 # copy requirments file into directory
-COPY requirements.txt .
+COPY marchMadnessReact/requirements.txt .
 
 # install requirements for python environment
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
-COPY app.py .
-COPY bracket.py .
-COPY dataDownLoad.py .
-COPY MattsMarchMadness.py .
+COPY marchMadnessReact/backend/app.py .
+COPY marchMadnessReact/backend/bracket.py .
+COPY marchMadnessReact/backend/dataDownLoad.py .
+COPY marchMadnessReact/backend/MattsMarchMadness.py .
 
 # Copy neccessary data
-COPY analysis.csv .
+COPY marchMadnessReact/backend/analysis.csv .
 COPY config.csv .
 COPY 03-16-2025-cbb-season-team-feed.xlsx .
-COPY marchMadTable_2025.csv .
+COPY marchMadnessReact/backend/marchMadTable_2025.csv .
 COPY other-data.csv .
 
 # copy templates and static files for the web
