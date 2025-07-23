@@ -11,6 +11,11 @@ regions = ['EAST', 'WEST', 'SOUTH', 'MIDWEST']
 
 
 def visualize_ncaab_bracket(path: str) -> None:
+    """
+    Prints out the bracket in terminal
+    :param path: path to csv file with schedule data
+    :return:
+    """
     with open(path, newline='') as bracket_csv:
         data = csv.reader(bracket_csv)
 
