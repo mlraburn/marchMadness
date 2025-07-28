@@ -25,7 +25,7 @@ schedule_dataframe: pandas.DataFrame = schedule_dataframe_raw[['GAME-ID', 'TEAM'
 tournament_dataframe: pandas.DataFrame = pandas.read_csv('marchMadTable_2025.csv')
 
 # load NS data
-other_data_N: pandas.DataFrame = pandas.read_csv('../../other-data.csv')
+other_data_N: pandas.DataFrame = pandas.read_csv('other-data.csv')
 
 
 def get_game(game_id: int) -> pandas.DataFrame:

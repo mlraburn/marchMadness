@@ -2,16 +2,89 @@
 import random
 import pandas
 import math
-from marchMadness.marchMadnessReact.backend import bracket, dataDownLoad
 import csv
 import sys  # base python
 import datetime
+import bracket_storage
+import data_download
+import bracket
 
-sd_raw = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")
-sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
+#sd_raw = pandas.read_excel("03-16-2025-cbb-season-team-feed.xlsx")
+#sd = sd_raw[['GAME-ID', 'TEAM', 'F']]
 
-td = pandas.read_csv('marchMadTable_2025.csv')
+#td = pandas.read_csv('marchMadTable_2025.csv')
 
+
+def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
+    """
+    given a certain bracket state - which is defined as positional ids and furthest round
+    this function will calculate what games are required to move the round to the next round.
+
+    It will return a list of tuples. Each tuple represents the game
+    Tuple: (position id team 1, position id team 2)
+
+    -- Assumption is that some games might have happened already that are required for the next round.
+    -- in that assumption we will not return that game
+
+    -- Assumption is that all games that must occur to move to the next round will always have happened
+    -- before the next round
+
+    -- Assumption is that first four teams are indicated by an extra letter at the end of their position
+    -- id
+
+    :param bracket_dict:
+    :return: Returns a list of games that must be played to move to the next round. Each element
+    in the list is a tuple like (position id team 1, position id team 2)
+    """
+
+    # to find what round we are in we will look for the furthest round any team is in
+    # EXCEPTION TO THIS RULE IS ROUND 0
+    # ROUND 0 COULD BE THE CURRENT ROUND WHILE OTHERS ARE IN ROUND 1 ALREADY
+
+    # get round we are in
+
+    current_round = get_current_round(bracket_dict)
+
+    print(current_round)
+
+    pass
+
+
+
+def get_current_round(bracket_dict: dict) -> int:
+    """
+    Takes a bracket state and returns the current round the tourney is in
+
+    0 aligns with first four
+
+    :param bracket_dict: positional ids and furthest round
+    :return: Returns an integer representing the current round of the tournament
+    """
+
+    max_round = 0
+    first_four_teams_advanced = 0
+    first_four_teams_in_bracket = 0
+    # find max round in furthest round in bracket
+    for team in bracket_dict:
+        # logic to advance the max round as it finds larger furthest rounds
+        if int(bracket_dict[team]) > max_round:
+            max_round = int(bracket_dict[team])
+
+        # logic to handle edge case where first four hasn't happened yet or completed
+        if len(team) == 4:
+
+            # this is to handle the edge case of some brackets not having
+            # the first four at all
+            first_four_teams_in_bracket += 1  # this is to handle the edge case of some brackets not having
+            if int(bracket_dict[team]) >= 1:  # this length is only for first four teams
+                first_four_teams_advanced += 1  # add up first four advanced counter
+
+    # if we have a max round of 1 but first four teams in bracket are 4 and 2 of them haven't advanced then
+    # we actually are in round 0
+    if max_round == 1 and first_four_teams_advanced < 2 and first_four_teams_in_bracket == 4:
+        max_round = 0
+
+    return max_round
 
 def create_analysis_df() -> pandas.DataFrame:
     t_list = td['TEAM_NAME'].tolist()
@@ -25,7 +98,7 @@ def create_analysis_df() -> pandas.DataFrame:
 
         seed = td[td['TEAM_NAME'] == team]['SEED'].iloc[0]
 
-        win_loss = dataDownLoad.get_record(team)
+        win_loss = data_download.get_record(team)
         wins = win_loss[0]
         losses = win_loss[1]
 
@@ -33,7 +106,7 @@ def create_analysis_df() -> pandas.DataFrame:
         analysis_dict['WINS'].append(wins)
         analysis_dict['LOSSES'].append(losses)
 
-        sos = dataDownLoad.strength_of_schedule_calculator(team)
+        sos = data_download.strength_of_schedule_calculator(team)
         analysis_dict['SOS'].append(sos)
 
         region = td[td['TEAM_NAME'] == team]['REGION'].iloc[0]
@@ -49,10 +122,10 @@ def create_analysis_df() -> pandas.DataFrame:
         win_loss_sos = win_loss_sos.__round__(1) + 1
         analysis_dict['WINDIFSOS'].append(win_loss_sos)
 
-        perf = dataDownLoad.get_reg_s_perf(team) + 1
+        perf = data_download.get_reg_s_perf(team) + 1
         analysis_dict['SCH_PERF'].append(perf)
 
-        ns_grade = dataDownLoad.get_nate_silver_grade(team)
+        ns_grade = data_download.get_nate_silver_grade(team)
         analysis_dict['NSGRADE'].append(ns_grade)
 
         melo = win_loss_sos * perf * ns_grade + 1
@@ -95,9 +168,7 @@ def find_team_in_order_range(rnd, region, upper, lower, df: pandas.DataFrame) ->
     while lower != upper + 1:
         if not df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)][
             'TEAM_NAME'].empty:
-            return \
-                df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)]
-                    ['TEAM_NAME'].iloc[0]
+            return df[(df['ROUND'] == rnd) & (df['REGION'] == region) & (df['ORDER_IN_REGION'] == lower)]['TEAM_NAME'].iloc[0]
         lower = lower + 1
     return team_name
 
@@ -150,7 +221,7 @@ def simulate_mm() -> pandas.DataFrame:
                 """
 
                 winning_team = game(top_team, bottom_team)
-                seed = dataDownLoad.get_seed(winning_team)
+                seed = data_download.get_seed(winning_team)
                 order = tourney_df[tourney_df['TEAM_NAME'] == winning_team]['ORDER_IN_REGION'].iloc[0]
 
                 row_to_add = {'TEAM_NAME': winning_team, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
@@ -167,9 +238,9 @@ def simulate_mm() -> pandas.DataFrame:
     midwest_winner = find_team_in_order_range(5, 'MIDWEST', 15, 0, tourney_df)
 
     winner_emw = game(east_winner, midwest_winner)
-    seed = dataDownLoad.get_seed(winner_emw)
+    seed = data_download.get_seed(winner_emw)
     order = tourney_df[tourney_df['TEAM_NAME'] == winner_emw]['ORDER_IN_REGION'].iloc[0]
-    region = dataDownLoad.get_region(winner_emw)
+    region = data_download.get_region(winner_emw)
 
     row_to_add = {'TEAM_NAME': winner_emw, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
@@ -178,9 +249,9 @@ def simulate_mm() -> pandas.DataFrame:
 
 
     winner_sw = game(south_winner, west_winner)
-    seed = dataDownLoad.get_seed(winner_sw)
+    seed = data_download.get_seed(winner_sw)
     order = tourney_df[tourney_df['TEAM_NAME'] == winner_sw]['ORDER_IN_REGION'].iloc[0]
-    region = dataDownLoad.get_region(winner_sw)
+    region = data_download.get_region(winner_sw)
 
     row_to_add = {'TEAM_NAME': winner_sw, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
@@ -190,9 +261,9 @@ def simulate_mm() -> pandas.DataFrame:
     rnd = rnd + 1
 
     champion = game(winner_emw, winner_sw)
-    seed = dataDownLoad.get_seed(champion)
+    seed = data_download.get_seed(champion)
     order = tourney_df[tourney_df['TEAM_NAME'] == champion]['ORDER_IN_REGION'].iloc[0]
-    region = dataDownLoad.get_region(champion)
+    region = data_download.get_region(champion)
 
     row_to_add = {'TEAM_NAME': champion, 'SEED': seed, 'REGION': region, 'ORDER_IN_REGION': order,
                   'ROUND': rnd + 1}
@@ -308,4 +379,24 @@ def generate_web_bracket():
 
 
 if __name__ == '__main__':
-    main()
+    """
+    testing the new code base below
+    """
+
+    position_id_map = bracket_storage.setup_positional_id_map()
+    initial_bracket = bracket_storage.setup_initial_bracket(position_id_map)
+
+    # Print to test
+    for position_id, team_name in position_id_map.items():
+        print(f"{position_id}: {team_name}")
+
+    print()
+
+    for position_id, last_round in initial_bracket.items():
+        print(f"{position_id}: {last_round}")
+
+    print()
+
+    get_games_for_a_round(initial_bracket)
+
+    # main()
