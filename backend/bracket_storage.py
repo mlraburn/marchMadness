@@ -22,13 +22,13 @@ this would imply that E16B would have a record in the bracket storage that was a
 
 import csv  #base
 
-def setup_positional_id_map(csv_file="analysis.csv") -> dict:
+def setup_positional_id_map(csv_file) -> dict:
     """
     Creates a positional id for each team
     Positional Map: Team Name
 
     CSV file must contain the following headers below
-    Headers: TEAM,SEED,REGION
+    Headers: TEAM_NAME,SEED,REGION
     Optional Headers: FIRST_FOUR with A or B as the value for the teams that play each other
 
     :param csv_file: default to analysis.csv but can be set to any file name
@@ -43,7 +43,7 @@ def setup_positional_id_map(csv_file="analysis.csv") -> dict:
 
         # loop through each team and create map
         for team in teams:
-            team_name = team['TEAM']
+            team_name = team['TEAM_NAME']
             seed = team['SEED']
             region = team['REGION']
 

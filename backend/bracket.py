@@ -164,3 +164,74 @@ def elo_prob(top_melo, bottom_melo) -> float:
         return 98.7 # maybe check the calibration
     else:
         return prob_to_win
+
+
+def get_current_round(bracket_dict: dict) -> int:
+    """
+    Takes a bracket state and returns the current round the tourney is in
+
+    0 aligns with first four
+
+    :param bracket_dict: positional ids and furthest round
+    :return: Returns an integer representing the current round of the tournament
+    """
+
+    max_round = 0
+    first_four_teams_advanced = 0
+    first_four_teams_in_bracket = 0
+    # find max round in furthest round in bracket
+    for team in bracket_dict:
+        # logic to advance the max round as it finds larger furthest rounds
+        if bracket_dict[team] > max_round:
+            max_round = bracket_dict[team]
+
+        # logic to handle edge case where first four hasn't happened yet or completed
+        if len(team) == 4:
+
+            # this is to handle the edge case of some brackets not having
+            # the first four at all
+            first_four_teams_in_bracket += 1  # this is to handle the edge case of some brackets not having
+            if int(bracket_dict[team]) >= 1:  # this length is only for first four teams
+                first_four_teams_advanced += 1  # add up first four advanced counter
+
+    # if we have a max round of 1 but first four teams in bracket are 4 and 2 of them haven't advanced then
+    # we actually are in round 0
+    if max_round == 1 and first_four_teams_advanced < 4 and first_four_teams_in_bracket == 8:
+        max_round = 0
+
+    return max_round
+
+
+def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
+    """
+    given a certain bracket state - which is defined as positional ids and furthest round
+    this function will calculate what games are required to move the round to the next round.
+
+    It will return a list of tuples. Each tuple represents the game
+    Tuple: (position id team 1, position id team 2)
+
+    -- Assumption is that some games might have happened already that are required for the next round.
+    -- in that assumption we will not return that game
+
+    -- Assumption is that all games that must occur to move to the next round will always have happened
+    -- before the next round
+
+    -- Assumption is that first four teams are indicated by an extra letter at the end of their position
+    -- id
+
+    :param bracket_dict:
+    :return: Returns a list of games that must be played to move to the next round. Each element
+    in the list is a tuple like (position id team 1, position id team 2)
+    """
+
+    # to find what round we are in we will look for the furthest round any team is in
+    # EXCEPTION TO THIS RULE IS ROUND 0
+    # ROUND 0 COULD BE THE CURRENT ROUND WHILE OTHERS ARE IN ROUND 1 ALREADY
+
+    # get round we are in
+
+    current_round = get_current_round(bracket_dict)
+
+    print("NOT FINISHED IMPLEMENTING")
+
+    pass
