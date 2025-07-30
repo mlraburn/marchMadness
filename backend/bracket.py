@@ -229,9 +229,55 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
     # ROUND 0 COULD BE THE CURRENT ROUND WHILE OTHERS ARE IN ROUND 1 ALREADY
 
     # get round we are in
-
     current_round = get_current_round(bracket_dict)
 
-    print("NOT FINISHED IMPLEMENTING")
+    games_remaining: list[tuple] = []  # what we will return
+
+    # edge case for first four
+    if current_round == 0:
+
+        # get first four teams that play which should be 8 teams
+        first_four_teams = []
+        for team in bracket_dict:
+            if len(team) == 4:
+                first_four_teams.append(team)
+
+        # sort them
+        first_four_teams.sort()
+
+        # get games that need to happen
+        # every region seed A B combo need one of the A B to be at 1 or the game hasn't occured yet
+
+        i = 0
+        while i < len(first_four_teams):
+            a_team = first_four_teams[i]
+            b_team = first_four_teams[i + 1]
+
+            a_team_round = bracket_dict[a_team]
+            b_team_round = bracket_dict[b_team]
+
+            # in this case one team has advanced
+            if a_team_round == 1 or b_team_round == 1:
+                continue
+            # in this case one team has not advanced so we must return this game
+            else:
+                games_remaining.append((a_team, b_team))
+
+            # increment the counter by 2
+            i += 2
+
+        return games_remaining
+
+    pass
+
+def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
+    """
+    play a game between two teams based on position id
+
+    the winner's position ID is returned
+    :param position_id_team_1: Position id of team 1
+    :param position_id_team_2: Position id of team 2
+    :return: the position ID of the winner
+    """
 
     pass
