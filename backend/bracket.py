@@ -221,6 +221,33 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
 
     -- RETURNS NONE WHEN TOURNAMENT CAN HAVE NO MORE GAMES
 
+    **************************************************************************
+    * COOL PATTERN NOTICED THAT HELPS TO AUTOMATICALLY CALCULATE WHO SHOULD  *
+    * PLAY WHO IN A CERTAIN REGION AND ROUND                                 *
+    * First round is kinda obvious same region and should add to 17          *
+    * Second round is the following algorith                                 *
+    * get seed X then calculate compliment to 17                             *
+    * take minimum and then find min(X, compliment to 17) + Y = 9            *
+    * Y is another seed that can be a possibility then the last              *
+    * possibility is Y + Z = 17                                              *
+    * teams are {X, compliment to 17, Y, Z} as stated above                  *
+    * or {X, C, Y, Z} where X + C = 17 = Y + Z and min(X,C) + min(Y,Z) = 9   *
+    *                                                                        *
+    * Algorithm for round 3 is similar but with                              *
+    * min(top-game-set) + min(bottom-game-set) = 5                           *
+    * so X is seed then C is compliment then get Y and Z per above           *
+    * then find min(X,C,Y,Z) + A = 5                                         *
+    * A is one seed option in the other team they will play                  *
+    * from there you can calculate the other team options using the pattern  *
+    * A + B = 17 and min(A,B) + D = 9                                        *
+    * D + E = 17                                                             *
+    * so top team is {X,C,Y,Z} and bottom team is {A,B,D,E}                  *
+    * round 4 is trivial because there are only two teams per region         *
+    * round 5 is hard coded because specific regions play specific regions   *
+    * round 6 is hard coded because region {F,G} can play {H,I}              *
+    * round 7 has no game                                                    *
+    **************************************************************************
+
     :param bracket_dict:
     :return: Returns a list of games that must be played to move to the next round. Each element
     in the list is a tuple like (position id team 1, position id team 2)
