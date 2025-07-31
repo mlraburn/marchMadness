@@ -246,6 +246,47 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
     * round 5 is hard coded because specific regions play specific regions   *
     * round 6 is hard coded because region {F,G} can play {H,I}              *
     * round 7 has no game                                                    *
+    *                                                                        *
+    * RANDOM SIDEBAR ABOUT THIS WHOLE IDEA                                   *
+    * The whole add to 17 compliment thing is also a min(A,B) in disguise    *
+    * its really min(top-team-list) + min(bottom-team-list) = 17 for round 1 *
+    * because the top list and bottom list is length 1 it looks like 17      *
+    * And then there is the coolest universal pattern which is how the       *
+    * min(setA) + min(setB) = # changes                                      *
+    * 64 teams: 17                                                           *
+    * 32 teams: 9  (sub 2^3)                                                 *
+    * 16 teams: 5  (sub 2^2)                                                 *
+    * 8  teams: 3  (sub 2^1)                                                 *
+    * 4  teams: 3  (sub 2^0) REGIONS MAP TO SPECIFIC REGIONS                 *
+    * 2  teams: 3  ALGORITHM HALTS MAP SET map to MAP SET of REGIONS         *
+    * kinda gnarly                                                           *
+    * the sub 2^# thing corresponds to amount rounds from a winner being     *
+    * picked from each seed set as in 1-16 region                            *
+    * so when 64 teams exist there is in each region 1-16 seeded teams       *
+    * and there are 4 rounds remaining until someone in the region           *
+    * will win the whole seeded region giving us (2^4)+1 being the min rule  *
+    * so the general formula for all fairly seeded tourneys is               *
+    * N being the number of teams in the round (for this case 16)            *
+    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
+    * so next round has N/2 teams so now its 8                               *
+    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
+    * this continues until log2(N) is 0 so min(list) is 1 which makes sense  *
+    * ---------------------------------------------------------------------- *
+    * So N being the number of teams in the round                            *
+    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
+    * formula above lets you resolve what possible teams any team can play   *
+    * based on knowing they are at some point in the round without           *
+    * having the graphical display or the structure we see in brackets       *
+    * ---------------------------------------------------------------------- *
+    * also this rule ensures this "fiarness" quality of the bracket          *
+    * this means that on average the 1 seed has the best chance for as many  *
+    * possible rounds because they won't play 2 seed after beating 16        *
+    * their best opponent must be a 9                                        *
+    * but the 2 seeds best opponent can be a 7                               *
+    * this keeps following for a 3 seeds best opponent is a 6                *
+    * while a 4 seeds best opponent is a 5                                   *
+    * this spreads the best possible next opponent to make 1 be the most     *
+    * desirable.
     **************************************************************************
 
     :param bracket_dict:
