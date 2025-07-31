@@ -202,7 +202,7 @@ def get_current_round(bracket_dict: dict) -> int:
     return max_round
 
 
-def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
+def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
     """
     given a certain bracket state - which is defined as positional ids and furthest round
     this function will calculate what games are required to move the round to the next round.
@@ -218,6 +218,8 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
 
     -- Assumption is that first four teams are indicated by an extra letter at the end of their position
     -- id
+
+    -- RETURNS NONE WHEN TOURNAMENT CAN HAVE NO MORE GAMES
 
     :param bracket_dict:
     :return: Returns a list of games that must be played to move to the next round. Each element
@@ -268,7 +270,11 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)]:
 
         return games_remaining
 
-    pass
+    # edge case for tournament being over
+    if current_round == 7:
+        return None  # because no games are left
+
+
 
 def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
     """
