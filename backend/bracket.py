@@ -342,6 +342,47 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
     if current_round == 7:
         return None  # because no games are left
 
+    # round 1 - 4 (4 is kinda trivial)
+    for team in bracket_dict:
+        if bracket_dict[team] == current_round:
+
+            seed_int = int(team[1:3])
+
+
+
+def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (list[int], list[int]):
+    """
+    Returns a list of seeds that could be in the position of where a seed finds itself based on the max seed number,
+    its own seed, and the current round As the first element of the tuple, and the second element returns
+    the list of seeds it could play against. This assumes a binary balanced tree.  The current round is that round 1
+    should be the round where there is only one team possible
+    :param seed_int:
+    :param max_seed:
+    :param current_round:
+    :return:
+    """
+
+    top_set = [seed_int]  # top is always the one we are looking at with seed_int
+    bottom_set = []
+    # loop up to round (equivalent of going up the binary tree)
+    for round_ in range(1, 2 ** (current_round - 1)+1):
+        if round_ == 2 ** (current_round - 1):
+            summed_to = (max_seed // 2 ** (round_ -2)) + 1
+            add_to_bottom = summed_to - min(top_set)
+            bottom_set.append(add_to_bottom)
+        else:
+            summed_to = (max_seed // 2 ** (round_ - 1)) + 1
+            add_to_top = summed_to - min(top_set)
+            top_set.append(add_to_top)
+
+    # loop down to 1 (equivalent of backtracking down the binary tree)
+    for round_ in range(2 ** (current_round - 1) - 1, 0, -1):
+        summed_to = (max_seed // 2**(round_ - 1)) + 1
+
+        add_to_bottom = summed_to - min(bottom_set)
+        bottom_set.append(add_to_bottom)
+
+    return top_set, bottom_set
 
 
 def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
@@ -355,3 +396,8 @@ def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
     """
 
     pass
+
+if __name__ == '__main__':
+    output = get_possible_seeds(3,16,2)
+
+    print(output)
