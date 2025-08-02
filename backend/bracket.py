@@ -365,24 +365,39 @@ def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (lis
     top_set = [seed_int]  # top is always the one we are looking at with seed_int
     bottom_set = []
     # loop up to round (equivalent of going up the binary tree)
-    for round_ in range(1, 2 ** (current_round - 1)+1):
-        if round_ == 2 ** (current_round - 1):
-            summed_to = (max_seed // 2 ** (round_ -2)) + 1
-            add_to_bottom = summed_to - min(top_set)
-            bottom_set.append(add_to_bottom)
+
+
+def round_palindrome(current_round: int) -> list[int]:
+    """
+    Creates a pattern where
+    round ->    pattern
+    1           1
+    2           1 2 1
+    3           1 2 1 3 1 2 1
+    4           1 2 1 3 1 2 1 4 1 2 1 3 1 2 1
+    :param current_round:
+    :return:
+    """
+
+    max_length = (current_round ** 2) - 1
+    palindrome_pattern = []
+
+    step_ladder = range(2, current_round + 1)
+    going_up = True
+    position_in_step_ladder = 0
+
+    for i in range(max_length - 1):
+        if i % 2 == 0:
+            palindrome_pattern.append(1)
         else:
-            summed_to = (max_seed // 2 ** (round_ - 1)) + 1
-            add_to_top = summed_to - min(top_set)
-            top_set.append(add_to_top)
+            if going_up:
+                # we go down
+            else:
+                palindrome_pattern.append(step_ladder[position_in_step_ladder])
+                # we go up
 
-    # loop down to 1 (equivalent of backtracking down the binary tree)
-    for round_ in range(2 ** (current_round - 1) - 1, 0, -1):
-        summed_to = (max_seed // 2**(round_ - 1)) + 1
 
-        add_to_bottom = summed_to - min(bottom_set)
-        bottom_set.append(add_to_bottom)
 
-    return top_set, bottom_set
 
 
 def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
@@ -398,6 +413,8 @@ def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
     pass
 
 if __name__ == '__main__':
+
+    round_palindrome(3)
     output = get_possible_seeds(3,16,2)
 
     print(output)
