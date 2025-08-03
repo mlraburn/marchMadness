@@ -66,26 +66,25 @@ def setup_positional_id_map(csv_file) -> dict:
 
     return positional_id_map
 
-def setup_initial_bracket(positional_id_dict: dict) -> dict:
+def setup_initial_bracket(positional_id_dict: dict) -> list[list]:
     """
-    Creates a bracket with keys being the furthest round a team has gotten to with each value
-    being a list of positional ids that are in playing order so the first two elements will play each
-    other and so on
+    Creates a bracket with just the 0th round which is the first four
 
-    ** OF NOTE THIS ADDS THE FIRST FOUR IN THE 1 ROUND AT THE BEGINNING BUT WE WILL TAKE OUT THOSE **
-    ** THAT LOSE **
+    the games are played in paired order
 
     :param positional_id_dict:
-    :return: returns a dictionary with initial bracket positions by furthers round as keys
+    :return: returns a dictionary with initial bracket with just first four at the beginning
     """
 
-    init_bracket = {}
+    init_bracket: list[list[str]] = []
+
+    # this creates lists for indexes 0 - 7 (standing for each round) of lists of strings
+    for i in range(0, 8):
+        init_bracket.append([])
 
     for positional_id in positional_id_dict:
         if len(positional_id) == 4:
             init_bracket[0].append(positional_id)
-
-        init_bracket[1].append(positional_id)
 
     return init_bracket
 
@@ -94,7 +93,7 @@ if __name__ == "__main__":
     Contains testing for file
     """
 
-    positional_id_map = setup_positional_id_map()
+    positional_id_map = setup_positional_id_map("marchMadTable_2025.csv")
     initial_bracket = setup_initial_bracket(positional_id_map)
 
     # Print to test

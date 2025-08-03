@@ -18,6 +18,9 @@ if __name__ == '__main__':
     positional_id_map = bracket_storage.setup_positional_id_map('marchMadTable_2025.csv')
     initial_bracket = bracket_storage.setup_initial_bracket(positional_id_map)
 
+    print(f"initial bracket: {initial_bracket}")
+    print()
+
     games_to_play = bracket.get_games_for_a_round(initial_bracket)
 
     for game in games_to_play:

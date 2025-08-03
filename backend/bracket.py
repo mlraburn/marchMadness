@@ -166,52 +166,33 @@ def elo_prob(top_melo, bottom_melo) -> float:
         return prob_to_win
 
 
-def get_current_round(bracket_dict: dict) -> int:
+def get_current_round(bracket_list: list) -> int:
     """
     Takes a bracket state and returns the current round the tourney is in
 
     0 aligns with first four
 
-    :param bracket_dict: positional ids and furthest round
+    :param bracket_list: rounds are elements in the list and each element is a list of positional ids
     :return: Returns an integer representing the current round of the tournament
     """
 
     max_round = 0
-    first_four_teams_advanced = 0
-    first_four_teams_in_bracket = 0
-    # find max round in furthest round in bracket
-    for team in bracket_dict:
-        # logic to advance the max round as it finds larger furthest rounds
-        if bracket_dict[team] > max_round:
-            max_round = bracket_dict[team]
 
-        # logic to handle edge case where first four hasn't happened yet or completed
-        if len(team) == 4:
-
-            # this is to handle the edge case of some brackets not having
-            # the first four at all
-            first_four_teams_in_bracket += 1  # this is to handle the edge case of some brackets not having
-            if int(bracket_dict[team]) >= 1:  # this length is only for first four teams
-                first_four_teams_advanced += 1  # add up first four advanced counter
-
-    # if we have a max round of 1 but first four teams in bracket are 4 and 2 of them haven't advanced then
-    # we actually are in round 0
-    if max_round == 1 and first_four_teams_advanced < 4 and first_four_teams_in_bracket == 8:
-        max_round = 0
+    # we do range from 1 to len(bracket_list) because we want to skip the 0th round cause that should return a 0
+    for i in range(1, len(bracket_list)):
+        if len(bracket_list[i]) > 0:
+            max_round += 1
 
     return max_round
 
 
-def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
+def get_games_for_a_round(bracket_list: list) -> list[(str, str)] or None:
     """
     given a certain bracket state - which is defined as positional ids and furthest round
     this function will calculate what games are required to move the round to the next round.
 
     It will return a list of tuples. Each tuple represents the game
     Tuple: (position id team 1, position id team 2)
-
-    -- Assumption is that some games might have happened already that are required for the next round.
-    -- in that assumption we will not return that game
 
     -- Assumption is that all games that must occur to move to the next round will always have happened
     -- before the next round
@@ -221,64 +202,30 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
 
     -- RETURNS NONE WHEN TOURNAMENT CAN HAVE NO MORE GAMES
 
-    :param bracket_dict:
+    :param bracket_list:
     :return: Returns a list of games that must be played to move to the next round. Each element
     in the list is a tuple like (position id team 1, position id team 2)
     """
 
-    # to find what round we are in we will look for the furthest round any team is in
-    # EXCEPTION TO THIS RULE IS ROUND 0
-    # ROUND 0 COULD BE THE CURRENT ROUND WHILE OTHERS ARE IN ROUND 1 ALREADY
-
     # get round we are in
-    current_round = get_current_round(bracket_dict)
+    current_round = get_current_round(bracket_list)
 
-    games_remaining: list[tuple] = []  # what we will return
+    games_to_play: list[tuple] = []  # what we will return
 
-    # edge case for first four
-    if current_round == 0:
+    # we want to loop through the teams in the current round
+    # each team will play the next team in the list so pair wise
+    top_team = ""
+    bottom_team = ""
+    for i, position_id in enumerate(bracket_list[current_round]):
+        # when odd so every 2
+        if i % 2 == 1:
+            bottom_team = position_id
+            games_to_play.append((top_team, bottom_team))
+        else:
+            top_team = position_id
 
-        # get first four teams that play which should be 8 teams
-        first_four_teams = []
-        for team in bracket_dict:
-            if len(team) == 4:
-                first_four_teams.append(team)
+    return games_to_play
 
-        # sort them
-        first_four_teams.sort()
-
-        # get games that need to happen
-        # every region seed A B combo need one of the A B to be at 1 or the game hasn't occured yet
-
-        i = 0
-        while i < len(first_four_teams):
-            a_team = first_four_teams[i]
-            b_team = first_four_teams[i + 1]
-
-            a_team_round = bracket_dict[a_team]
-            b_team_round = bracket_dict[b_team]
-
-            # in this case one team has advanced
-            if a_team_round == 1 or b_team_round == 1:
-                continue
-            # in this case one team has not advanced so we must return this game
-            else:
-                games_remaining.append((a_team, b_team))
-
-            # increment the counter by 2
-            i += 2
-
-        return games_remaining
-
-    # edge case for tournament being over
-    if current_round == 7:
-        return None  # because no games are left
-
-    # round 1 - 4 (4 is kinda trivial)
-    for team in bracket_dict:
-        if bracket_dict[team] == current_round:
-
-            seed_int = int(team[1:3])
 
 
 
@@ -315,8 +262,4 @@ def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
     pass
 
 if __name__ == '__main__':
-
-    round_palindrome(3)
-    output = get_possible_seeds(3,16,2)
-
-    print(output)
+    pass
