@@ -1,7 +1,7 @@
 """
 File contains functions for storing and loading bracket data
 
-Bracket schema
+Bracket schema for COMPLETED BRACKETS
 
 Each team gets a positional name
 E01 indicates the East regions number one seed
@@ -17,6 +17,10 @@ The bracket gets stored where
 
 {E16A, 0} would indicate that this team lost in the first 4 games which is sorta the 0th round
 this would imply that E16B would have a record in the bracket storage that was at least a 1 or greater
+
+BRACKET STORAGE FOR IN MEMORY CALCULATIONS IS DICTIONARY WITH ROUND NUMBER BEING KEY
+
+EACH VALUE WILL BE A LIST OF POSITION IDS THAT ARE IN ORDER SO THE FIRST 2 WILL PLAY EACH OTHER AND SO ON
 
 """
 
@@ -64,26 +68,26 @@ def setup_positional_id_map(csv_file) -> dict:
 
 def setup_initial_bracket(positional_id_dict: dict) -> dict:
     """
-    Creates the initial bracket using the positional id map
+    Creates a bracket with keys being the furthest round a team has gotten to with each value
+    being a list of positional ids that are in playing order so the first two elements will play each
+    other and so on
 
-    This function is pretty simple because it sets up all teams to round 1
-
-    ** EXCEPT IT PUTS FIRST FOUR TEAMS AT ROUND 0 **
+    ** OF NOTE THIS ADDS THE FIRST FOUR IN THE 1 ROUND AT THE BEGINNING BUT WE WILL TAKE OUT THOSE **
+    ** THAT LOSE **
 
     :param positional_id_dict:
-    :return: returns a dictionary with initial bracket positions
+    :return: returns a dictionary with initial bracket positions by furthers round as keys
     """
 
-    initial_bracket = {}
+    init_bracket = {}
 
     for positional_id in positional_id_dict:
+        if len(positional_id) == 4:
+            init_bracket[0].append(positional_id)
 
-        if positional_id[-1] in ['A', 'B']:
-            initial_bracket[positional_id] = 0
-        else:
-            initial_bracket[positional_id] = 1
+        init_bracket[1].append(positional_id)
 
-    return initial_bracket
+    return init_bracket
 
 if __name__ == "__main__":
     """

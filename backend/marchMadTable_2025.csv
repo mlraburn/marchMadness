@@ -1,5 +1,6 @@
 TEAM_NAME,SEED,REGION,FIRST_FOUR
 Duke Blue Devils,1,EAST,
+American University Eagles,16,EAST,A
 Mount St. Mary's Mountaineers,16,EAST,B
 Mississippi State Bulldogs,8,EAST,
 Baylor Bears,9,EAST,
@@ -15,6 +16,41 @@ Saint Mary's Gaels,7,EAST,
 Vanderbilt Commodores,10,EAST,
 Alabama Crimson Tide,2,EAST,
 Robert Morris Colonials,15,EAST,
+Houston Cougars,1,MIDWEST,
+SIU Edwardsville Cougars,16,MIDWEST,
+Gonzaga Bulldogs,8,MIDWEST,
+Georgia Bulldogs,9,MIDWEST,
+Clemson Tigers,5,MIDWEST,
+McNeese Cowboys,12,MIDWEST,
+Purdue Boilermakers,4,MIDWEST,
+High Point Panthers,13,MIDWEST,
+Illinois Fighting Illini,6,MIDWEST,
+Texas Longhorns,11,MIDWEST,A
+Xavier Musketeers,11,MIDWEST,B
+Kentucky Wildcats,3,MIDWEST,
+Troy Trojans,14,MIDWEST,
+UCLA Bruins,7,MIDWEST,
+Utah State Aggies,10,MIDWEST,
+Tennessee Volunteers,2,MIDWEST,
+Wofford Terriers,15,MIDWEST,
+Auburn Tigers,1,SOUTH,
+Alabama State Hornets,16,SOUTH,A
+St. Francis (PA) Red Flash,16,SOUTH,B
+Louisville Cardinals,8,SOUTH,
+Creighton Bluejays,9,SOUTH,
+Michigan Wolverines,5,SOUTH,
+UC San Diego Tritons,12,SOUTH,
+Texas A&M Aggies,4,SOUTH,
+Yale Bulldogs,13,SOUTH,
+Ole Miss Rebels,6,SOUTH,
+San Diego State Aztecs,11,SOUTH,A
+North Carolina Tar Heels,11,SOUTH,B
+Iowa State Cyclones,3,SOUTH,
+Lipscomb Bisons,14,SOUTH,
+Marquette Golden Eagles,7,SOUTH,
+New Mexico Lobos,10,SOUTH,
+Michigan State Spartans,2,SOUTH,
+Bryant Bulldogs,15,SOUTH,
 Florida Gators,1,WEST,
 Norfolk State Spartans,16,WEST,
 UConn Huskies,8,WEST,
@@ -31,39 +67,3 @@ Kansas Jayhawks,7,WEST,
 Arkansas Razorbacks,10,WEST,
 St. John's Red Storm,2,WEST,
 Omaha Mavericks,15,WEST,
-Auburn Tigers,1,SOUTH,
-Alabama State Hornets,16,SOUTH,A
-Louisville Cardinals,8,SOUTH,
-Creighton Bluejays,9,SOUTH,
-Michigan Wolverines,5,SOUTH,
-UC San Diego Tritons,12,SOUTH,
-Texas A&M Aggies,4,SOUTH,
-Yale Bulldogs,13,SOUTH,
-Ole Miss Rebels,6,SOUTH,
-North Carolina Tar Heels,11,SOUTH,B
-Iowa State Cyclones,3,SOUTH,
-Lipscomb Bisons,14,SOUTH,
-Marquette Golden Eagles,7,SOUTH,
-New Mexico Lobos,10,SOUTH,
-Michigan State Spartans,2,SOUTH,
-Bryant Bulldogs,15,SOUTH,
-Houston Cougars,1,MIDWEST,
-SIU Edwardsville Cougars,16,MIDWEST,
-Gonzaga Bulldogs,8,MIDWEST,
-Georgia Bulldogs,9,MIDWEST,
-Clemson Tigers,5,MIDWEST,
-McNeese Cowboys,12,MIDWEST,
-Purdue Boilermakers,4,MIDWEST,
-High Point Panthers,13,MIDWEST,
-Illinois Fighting Illini,6,MIDWEST,
-Xavier Musketeers,11,MIDWEST,B
-Kentucky Wildcats,3,MIDWEST,
-Troy Trojans,14,MIDWEST,
-UCLA Bruins,7,MIDWEST,
-Utah State Aggies,10,MIDWEST,
-Tennessee Volunteers,2,MIDWEST,
-Wofford Terriers,15,MIDWEST,
-St. Francis (PA) Red Flash,16,SOUTH,B
-Texas Longhorns,11,MIDWEST,A
-American University Eagles,16,EAST,A
-San Diego State Aztecs,11,SOUTH,A

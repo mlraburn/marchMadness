@@ -221,74 +221,6 @@ def get_games_for_a_round(bracket_dict: dict) -> list[(str, str)] or None:
 
     -- RETURNS NONE WHEN TOURNAMENT CAN HAVE NO MORE GAMES
 
-    **************************************************************************
-    * COOL PATTERN NOTICED THAT HELPS TO AUTOMATICALLY CALCULATE WHO SHOULD  *
-    * PLAY WHO IN A CERTAIN REGION AND ROUND                                 *
-    * First round is kinda obvious same region and should add to 17          *
-    * Second round is the following algorith                                 *
-    * get seed X then calculate compliment to 17                             *
-    * take minimum and then find min(X, compliment to 17) + Y = 9            *
-    * Y is another seed that can be a possibility then the last              *
-    * possibility is Y + Z = 17                                              *
-    * teams are {X, compliment to 17, Y, Z} as stated above                  *
-    * or {X, C, Y, Z} where X + C = 17 = Y + Z and min(X,C) + min(Y,Z) = 9   *
-    *                                                                        *
-    * Algorithm for round 3 is similar but with                              *
-    * min(top-game-set) + min(bottom-game-set) = 5                           *
-    * so X is seed then C is compliment then get Y and Z per above           *
-    * then find min(X,C,Y,Z) + A = 5                                         *
-    * A is one seed option in the other team they will play                  *
-    * from there you can calculate the other team options using the pattern  *
-    * A + B = 17 and min(A,B) + D = 9                                        *
-    * D + E = 17                                                             *
-    * so top team is {X,C,Y,Z} and bottom team is {A,B,D,E}                  *
-    * round 4 is trivial because there are only two teams per region         *
-    * round 5 is hard coded because specific regions play specific regions   *
-    * round 6 is hard coded because region {F,G} can play {H,I}              *
-    * round 7 has no game                                                    *
-    *                                                                        *
-    * RANDOM SIDEBAR ABOUT THIS WHOLE IDEA                                   *
-    * The whole add to 17 compliment thing is also a min(A,B) in disguise    *
-    * its really min(top-team-list) + min(bottom-team-list) = 17 for round 1 *
-    * because the top list and bottom list is length 1 it looks like 17      *
-    * And then there is the coolest universal pattern which is how the       *
-    * min(setA) + min(setB) = # changes                                      *
-    * 64 teams: 17                                                           *
-    * 32 teams: 9  (sub 2^3)                                                 *
-    * 16 teams: 5  (sub 2^2)                                                 *
-    * 8  teams: 3  (sub 2^1)                                                 *
-    * 4  teams: 3  (sub 2^0) REGIONS MAP TO SPECIFIC REGIONS                 *
-    * 2  teams: 3  ALGORITHM HALTS MAP SET map to MAP SET of REGIONS         *
-    * kinda gnarly                                                           *
-    * the sub 2^# thing corresponds to amount rounds from a winner being     *
-    * picked from each seed set as in 1-16 region                            *
-    * so when 64 teams exist there is in each region 1-16 seeded teams       *
-    * and there are 4 rounds remaining until someone in the region           *
-    * will win the whole seeded region giving us (2^4)+1 being the min rule  *
-    * so the general formula for all fairly seeded tourneys is               *
-    * N being the number of teams in the round (for this case 16)            *
-    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
-    * so next round has N/2 teams so now its 8                               *
-    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
-    * this continues until log2(N) is 0 so min(list) is 1 which makes sense  *
-    * ---------------------------------------------------------------------- *
-    * So N being the number of teams in the round                            *
-    * min(top-team-list) + min(bottom-team-list) = 2^(log2(N))+1             *
-    * formula above lets you resolve what possible teams any team can play   *
-    * based on knowing they are at some point in the round without           *
-    * having the graphical display or the structure we see in brackets       *
-    * ---------------------------------------------------------------------- *
-    * also this rule ensures this "fiarness" quality of the bracket          *
-    * this means that on average the 1 seed has the best chance for as many  *
-    * possible rounds because they won't play 2 seed after beating 16        *
-    * their best opponent must be a 9                                        *
-    * but the 2 seeds best opponent can be a 7                               *
-    * this keeps following for a 3 seeds best opponent is a 6                *
-    * while a 4 seeds best opponent is a 5                                   *
-    * this spreads the best possible next opponent to make 1 be the most     *
-    * desirable.
-    **************************************************************************
-
     :param bracket_dict:
     :return: Returns a list of games that must be played to move to the next round. Each element
     in the list is a tuple like (position id team 1, position id team 2)
@@ -364,37 +296,7 @@ def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (lis
 
     top_set = [seed_int]  # top is always the one we are looking at with seed_int
     bottom_set = []
-    # loop up to round (equivalent of going up the binary tree)
-
-
-def round_palindrome(current_round: int) -> list[int]:
-    """
-    Creates a pattern where
-    round ->    pattern
-    1           1
-    2           1 2 1
-    3           1 2 1 3 1 2 1
-    4           1 2 1 3 1 2 1 4 1 2 1 3 1 2 1
-    :param current_round:
-    :return:
-    """
-
-    max_length = (current_round ** 2) - 1
-    palindrome_pattern = []
-
-    step_ladder = range(2, current_round + 1)
-    going_up = True
-    position_in_step_ladder = 0
-
-    for i in range(max_length - 1):
-        if i % 2 == 0:
-            palindrome_pattern.append(1)
-        else:
-            if going_up:
-                # we go down
-            else:
-                palindrome_pattern.append(step_ladder[position_in_step_ladder])
-                # we go up
+    # loop up to round (equivalent of going up the binary tree
 
 
 
