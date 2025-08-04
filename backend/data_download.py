@@ -415,7 +415,7 @@ def main():
     team_list: list[str] = tournament_dataframe['TEAM_NAME'].tolist()
 
     # declare the analysis dictionary
-    analysis_dictionary = {'TEAM': [], 'SEED': [], 'WINS': [], 'LOSSES': [], 'SOS': [], 'REGION': [], 'ORDER': [],
+    analysis_dictionary = {'TEAM': [], 'SEED': [], 'WINS': [], 'LOSSES': [], 'SOS': [], 'REGION': [],
                                  'WINDIFSOS': [], 'SCH_PERF': [], 'NSGRADE': [], 'MELO': []}
 
     # TEAM: name of team as                 str
@@ -441,11 +441,11 @@ def main():
         losses = win_loss[1]
 
         region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
-        order = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['ORDER_IN_REGION'].iloc[0]
 
         win_loss_dif_sos = win_loss_difference_strength_of_schedule(wins, losses, sos)
         perf = get_reg_s_perf(team)
 
+        print(team)
         ns_elo = get_nate_silver_grade(team)
 
         # add data to analysis dictionary
@@ -455,7 +455,6 @@ def main():
         analysis_dictionary['LOSSES'].append(losses)
         analysis_dictionary['SOS'].append(sos)
         analysis_dictionary['REGION'].append(region)
-        analysis_dictionary['ORDER'].append(order)
         analysis_dictionary['WINDIFSOS'].append(win_loss_dif_sos)
         analysis_dictionary['SCH_PERF'].append(perf)
         analysis_dictionary['NSGRADE'].append(ns_elo)

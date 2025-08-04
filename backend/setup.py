@@ -21,7 +21,13 @@ if __name__ == '__main__':
     print(f"initial bracket: {initial_bracket}")
     print()
 
+    # create the analysis csv
+
+
+
     games_to_play = bracket.get_games_for_a_round(initial_bracket)
+
+
 
     for game in games_to_play:
         print(game)

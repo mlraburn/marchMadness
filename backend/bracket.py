@@ -227,8 +227,6 @@ def get_games_for_a_round(bracket_list: list) -> list[(str, str)] or None:
     return games_to_play
 
 
-
-
 def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (list[int], list[int]):
     """
     Returns a list of seeds that could be in the position of where a seed finds itself based on the max seed number,
@@ -244,9 +242,6 @@ def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (lis
     top_set = [seed_int]  # top is always the one we are looking at with seed_int
     bottom_set = []
     # loop up to round (equivalent of going up the binary tree
-
-
-
 
 
 def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
