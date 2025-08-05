@@ -6,9 +6,19 @@ Mostly it does this by calculating the MELO scores for each team
 
 import bracket_storage
 import bracket
+import sys  # base python
+from datetime import date
 
 def main() -> None:
     """
+    function can be ran from terminal with
+    ```
+    python [tournament_info_file.csv]
+    ```
+
+    if file is ran without this argument then it will default to looking for:
+    marchMadness_YYYY.csv
+
     This function needs to be run once upon the following conditions:
 
     1. there is a march madness YYYY.csv file with below columns
@@ -20,6 +30,27 @@ def main() -> None:
 
     2. there may need to be other analysis tables with matching team names or pos ids (current is team name match)
     """
+
+    # check to see if there were arguments
+    tourney_path = ""
+    if len(sys.argv) == 1:
+        tourney_path = sys.argv[1]
+
+    # if no path is given try default and notify user
+    if tourney_path == "":
+        year = date.today().year
+        print(f"No tournament path provided: Using default file path: marchMadness_{year}.csv")
+        tourney_path = f"marchMadness_{year}.csv"
+
+    # create positional_id_map
+    positional_id_map = bracket_storage.setup_positional_id_map(tourney_path)
+
+    # create initial bracket map (keys are round made it to)
+    initial_bracket = bracket_storage.setup_initial_bracket(positional_id_map)
+
+    # create analysis and add to positional_id_map
+
+
 
 
 
