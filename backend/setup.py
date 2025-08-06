@@ -33,14 +33,14 @@ def main() -> None:
 
     # check to see if there were arguments
     tourney_path = ""
-    if len(sys.argv) == 1:
+    if len(sys.argv) > 1:
         tourney_path = sys.argv[1]
 
     # if no path is given try default and notify user
     if tourney_path == "":
         year = date.today().year
         print(f"No tournament path provided: Using default file path: marchMadness_{year}.csv")
-        tourney_path = f"marchMadness_{year}.csv"
+        tourney_path = f"marchMadTable_{year}.csv"
 
     # create positional_id_map
     positional_id_map = bracket_storage.setup_positional_id_map(tourney_path)
@@ -49,6 +49,7 @@ def main() -> None:
     initial_bracket = bracket_storage.setup_initial_bracket(positional_id_map)
 
     # create analysis and add to positional_id_map
+    data_download.main()
 
 
 
@@ -63,6 +64,9 @@ if __name__ == '__main__':
     # REGION: ALL CAPS one word
     # FIRST_FOUR: blank or A or B (A for top and B for bottom based on NCAA site bracket)
 
+    main()
+    """
+    
     positional_id_map = bracket_storage.setup_positional_id_map('marchMadTable_2025.csv')
 
     for team in positional_id_map:
@@ -77,5 +81,6 @@ if __name__ == '__main__':
 
     for game in games_to_play:
         print(game)
+    """
 
 
