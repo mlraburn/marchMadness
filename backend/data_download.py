@@ -5,6 +5,8 @@ This file creates the analysis of the schedule and generates the ELO values that
 their success throughout the simulated bracket
 
 """
+import csv
+
 import pandas   # pip install pandas
 import math     # base python
 
@@ -399,6 +401,48 @@ def create_analysis() -> pandas.DataFrame:
     return sorted_sos
 
 
+def add_melo_to_positional_map(positional_id_map: dict) -> dict:
+    """
+    Updates the positional ID map with MELO values from analysis.csv
+    """
+
+    updated_positional_id_map = {}
+
+    with open('analysis.csv', 'r', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        teams = list(reader)  # ** I need to change this to a dataframe to do what I want **
+
+        # we loop through position id because we want to preserve
+        # key order in dictionary
+        for position_id in positional_id_map:
+
+            # get MELO based on position ID
+
+
+            # taco
+            melo = team['MELO']
+
+            # now we get the position ID string from the analysis file
+            region = team['REGION']
+            seed = team['SEED']
+
+            position_id_key = f"{region[0]}{seed.zfill(2)}"
+
+            if position_id_key in positional_id_map:
+                name_in_position_dict = positional_id_map[position_id_key]
+
+                updated_positional_id_map[position_id_key] = {"name": name_in_position_dict, "melo": melo}
+            else:
+                print(f"{position_id_key} not found in positional ID maps")
+
+    return updated_positional_id_map
+
+
+
+
+
+
+
 def main():
     """
     Main Initializing function
@@ -450,7 +494,13 @@ def main():
 
         # add data to analysis dictionary
         analysis_dictionary['TEAM'].append(team)
-        analysis_dictionary['SEED'].append(seed)
+
+        # edit seed to contain A or B indication for First Four
+        a_or_b = ""
+        if pandas.notna(tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['FIRST_FOUR'].iloc[0]):
+            a_or_b = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['FIRST_FOUR'].iloc[0]
+        analysis_dictionary['SEED'].append(f"{seed}{a_or_b}")
+
         analysis_dictionary['WINS'].append(wins)
         analysis_dictionary['LOSSES'].append(losses)
         analysis_dictionary['SOS'].append(sos)

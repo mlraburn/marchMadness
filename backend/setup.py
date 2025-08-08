@@ -8,6 +8,7 @@ import bracket_storage
 import bracket
 import sys  # base python
 from datetime import date
+import data_download
 
 def main() -> None:
     """
@@ -45,13 +46,23 @@ def main() -> None:
     # create positional_id_map
     positional_id_map = bracket_storage.setup_positional_id_map(tourney_path)
 
+    # DEBUG BLOCK
+    for p in positional_id_map:
+        print(f"positional id map: {p} value: {positional_id_map[p]}")
+    # DEBUG BLOCK
+
     # create initial bracket map (keys are round made it to)
     initial_bracket = bracket_storage.setup_initial_bracket(positional_id_map)
 
-    # create analysis and add to positional_id_map
+    # create analysis
     data_download.main()
 
+    # add MELO to the positional_id_map
+    pos_id_plus_melo_map = data_download.add_melo_to_positional_map(positional_id_map)
 
+    # print out pos id melo map
+    for pos_id in pos_id_plus_melo_map:
+        print(f"Position ID: {pos_id} Name: {pos_id_plus_melo_map[pos_id]['name']} Melo: {pos_id_plus_melo_map[pos_id]['melo']}")
 
 
 
@@ -65,8 +76,8 @@ if __name__ == '__main__':
     # FIRST_FOUR: blank or A or B (A for top and B for bottom based on NCAA site bracket)
 
     main()
+
     """
-    
     positional_id_map = bracket_storage.setup_positional_id_map('marchMadTable_2025.csv')
 
     for team in positional_id_map:
