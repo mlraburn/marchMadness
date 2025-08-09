@@ -412,6 +412,8 @@ def add_melo_to_positional_map(positional_id_map: dict) -> dict:
         reader = csv.DictReader(csvfile)
         teams = list(reader)  # ** I need to change this to a dataframe to do what I want **
 
+        analysis_pd = pandas.read_csv('analysis.csv')
+
         # we loop through position id because we want to preserve
         # key order in dictionary
         for position_id in positional_id_map:
