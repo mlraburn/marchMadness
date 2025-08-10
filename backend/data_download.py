@@ -409,40 +409,32 @@ def add_melo_to_positional_map(positional_id_map: dict) -> dict:
     updated_positional_id_map = {}
 
     with open('analysis.csv', 'r', newline='') as csvfile:
-        reader = csv.DictReader(csvfile)
-        teams = list(reader)  # ** I need to change this to a dataframe to do what I want **
+        reader = csv.reader(csvfile)
 
-        analysis_pd = pandas.read_csv('analysis.csv')
+        teams = list(reader)
+
+        # convert the teams list to a dict with position id as the key\
+        teams_dict_with_analysis = {}
+        for i in range(1, len(teams)):
+            if teams[i][2][-1] == 'A' or teams[i][2][-1] == 'B':
+                pos_id = f"{teams[i][6][0]}{teams[i][2].zfill(3)}"
+            else:
+                pos_id = f"{teams[i][6][0]}{teams[i][2].zfill(2)}"
+
+            teams_dict_with_analysis[pos_id] = int(teams[i][10])
 
         # we loop through position id because we want to preserve
         # key order in dictionary
         for position_id in positional_id_map:
 
-            # get MELO based on position ID
+            # get MELO based on teams_dict_with_analysis
+            melo = teams_dict_with_analysis[position_id]
 
+            name = positional_id_map[position_id]
 
-            # taco
-            melo = team['MELO']
-
-            # now we get the position ID string from the analysis file
-            region = team['REGION']
-            seed = team['SEED']
-
-            position_id_key = f"{region[0]}{seed.zfill(2)}"
-
-            if position_id_key in positional_id_map:
-                name_in_position_dict = positional_id_map[position_id_key]
-
-                updated_positional_id_map[position_id_key] = {"name": name_in_position_dict, "melo": melo}
-            else:
-                print(f"{position_id_key} not found in positional ID maps")
+            updated_positional_id_map[position_id] = {"name": name, "melo": melo}
 
     return updated_positional_id_map
-
-
-
-
-
 
 
 def main():
