@@ -64,6 +64,11 @@ def main() -> None:
     for pos_id in pos_id_plus_melo_map:
         print(f"Position ID: {pos_id} Name: {pos_id_plus_melo_map[pos_id]['name']} Melo: {pos_id_plus_melo_map[pos_id]['melo']}")
 
+    # EVENTUALLY WE WANT TO MAKE THIS MAP IN THIS ORDER TO BE PUT INTO A CONFIG FILE OF SORTS
+    # THIS WILL BE THE MAIN WAY WE SIMULATE TOURNAMENTS
+    # THE ORDER PRESERVES THE TOURNEY STRUCTURE IN O(1) TIME
+    # THE ONLY ISSUE WE NEED TO WORK OUT IS HOW TO HANDLE THE A/B'S
+
 
 
 if __name__ == '__main__':
