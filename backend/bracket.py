@@ -243,6 +243,8 @@ def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (lis
     bottom_set = []
     # loop up to round (equivalent of going up the binary tree
 
+def play_a_round(games_list: list[tuple], current_bracket_state: dict, ) ->
+
 
 def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
     """

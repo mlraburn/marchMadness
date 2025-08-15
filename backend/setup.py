@@ -69,6 +69,24 @@ def main() -> None:
     # THE ORDER PRESERVES THE TOURNEY STRUCTURE IN O(1) TIME
     # THE ONLY ISSUE WE NEED TO WORK OUT IS HOW TO HANDLE THE A/B'S
 
+    # DEBUG BLOCK
+    # WE WILL HAVE THE SIMULATOR BE ITS OWN FUNCTION
+    # BUT FOR NOW WE WILL JUST HAVE IT HERE TO SEE IF IT WORKS
+
+    for round_ in range(8):
+
+        print(f"Round number: {round_}")
+
+        curr_round = bracket.get_current_round(initial_bracket)
+
+        print(f"Current round number: {curr_round}")
+
+        games_to_play: list[tuple] =  bracket.get_games_for_a_round(initial_bracket)
+
+
+
+    # END DEBUG BLOCK
+
 
 
 if __name__ == '__main__':
