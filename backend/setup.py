@@ -73,16 +73,18 @@ def main() -> None:
     # WE WILL HAVE THE SIMULATOR BE ITS OWN FUNCTION
     # BUT FOR NOW WE WILL JUST HAVE IT HERE TO SEE IF IT WORKS
 
-    for round_ in range(8):
+    for round_ in initial_bracket:
+        print(f"Round: {round_}")
+        print()
 
-        print(f"Round number: {round_}")
+        games_to_play = bracket.get_games_for_a_round(initial_bracket)
 
-        curr_round = bracket.get_current_round(initial_bracket)
+        initial_bracket = bracket.play_a_round(games_to_play, initial_bracket, pos_id_plus_melo_map)
 
-        print(f"Current round number: {curr_round}")
+        for r in initial_bracket:
+            print(f"Round: {r}")
 
-        games_to_play: list[tuple] =  bracket.get_games_for_a_round(initial_bracket)
-
+        print()
 
 
     # END DEBUG BLOCK

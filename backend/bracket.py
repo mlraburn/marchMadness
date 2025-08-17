@@ -6,6 +6,8 @@ import csv          # base
 import math         # base
 import pandas       # pip install pandas
 import data_download
+from backend.data_download import get_MELO
+import random       # base
 
 regions = ['EAST', 'WEST', 'SOUTH', 'MIDWEST']
 
@@ -161,7 +163,7 @@ def elo_prob(top_melo, bottom_melo) -> float:
     # adjusted to 0.07256*X + 53.23
     prob_to_win = (.07256 * dif_elo) + 53.23
     if prob_to_win >= 100:
-        return 98.7 # maybe check the calibration
+        return 99.0 # maybe check the calibration
     else:
         return prob_to_win
 
@@ -227,36 +229,73 @@ def get_games_for_a_round(bracket_list: list) -> list[(str, str)] or None:
     return games_to_play
 
 
-def get_possible_seeds(seed_int: int, max_seed: int, current_round: int) -> (list[int], list[int]):
+def play_a_round(games_list: list[tuple], current_bracket_state: list, tournament_info: dict) -> list:
     """
-    Returns a list of seeds that could be in the position of where a seed finds itself based on the max seed number,
-    its own seed, and the current round As the first element of the tuple, and the second element returns
-    the list of seeds it could play against. This assumes a binary balanced tree.  The current round is that round 1
-    should be the round where there is only one team possible
-    :param seed_int:
-    :param max_seed:
-    :param current_round:
-    :return:
+    Plays a round of the tournament
+
+    :param games_list: list of games to be played. List of tuples with 2 elements each a position ID
+    :param current_bracket_state:  current bracket state with keys being the rounds so 0 is first four and 7 is champ
+    :param tournament_info: dictionary storing names, pos ids, and melos
+    :return: the next bracket state
     """
+    next_bracket_state: list = current_bracket_state
 
-    top_set = [seed_int]  # top is always the one we are looking at with seed_int
-    bottom_set = []
-    # loop up to round (equivalent of going up the binary tree
+    next_round = get_current_round(current_bracket_state) + 1
+    for game in games_list:
+        melo_1 = tournament_info[game[0]]['melo']
+        melo_2 = tournament_info[game[1]]['melo']
+        winner = play_a_game(game[0], melo_1, game[1], melo_2)
 
-def play_a_round(games_list: list[tuple], current_bracket_state: dict, ) ->
+        next_bracket_state[next_round].append(winner)
 
+    # there is a weird case for round 0 where our next round must contain teams that didn't win the prior round
+    # we only do this for current round being 0
+    if next_round == 1:
+        # make a copy of the list of winners
 
-def play_a_game(position_id_team_1: str, position_id_team_2: str) -> str:
+        first_four_winners = next_bracket_state[next_round].copy()  # just copying strings so .copy is fine
+        next_bracket_state[next_round].clear()  # clear out the list cause we are going to build it with 64
+        for team_pos_id in enumerate(tournament_info):
+
+            # check if team is a first four then only append if they won
+            if len(team_pos_id) > 3:
+                if team_pos_id in first_four_winners:
+                    next_bracket_state[next_round].append(team_pos_id)
+                else:
+                    continue
+            else:  # if they are not in the first four team of 8 teams then just append in order
+                next_bracket_state[next_round].append(team_pos_id)
+
+    return next_bracket_state
+
+def play_a_game(position_id_team_1: str, melo_1: int, position_id_team_2: str, melo_2: int) -> str:
     """
-    play a game between two teams based on position id
+    Plays a game in the tournament
 
-    the winner's position ID is returned
     :param position_id_team_1: Position id of team 1
-    :param position_id_team_2: Position id of team 2
-    :return: the position ID of the winner
+    :param melo_1: MELO of team 1
+    :param position_id_team_2: Position ID of team 2
+    :param melo_2: MELO if team 2
+    :return: the position id of the winner
     """
 
-    pass
+    prob_of_team_1 = elo_prob(melo_1, melo_2)
+
+    # DEBUG PRINTS
+    print()
+    print(f"{position_id_team_1} vs. {position_id_team_2}")
+    print(f"{melo_1} vs. {melo_2}")
+    print(f"{prob_of_team_1}")
+    print()
+    # DEBUG PRINTS
+
+    random_= random.random()
+
+    if prob_of_team_1 >= random_:
+        return position_id_team_1
+    else:
+        return position_id_team_2
+
 
 if __name__ == '__main__':
     pass
