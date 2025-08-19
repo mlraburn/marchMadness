@@ -255,7 +255,7 @@ def play_a_round(games_list: list[tuple], current_bracket_state: list, tournamen
 
         first_four_winners = next_bracket_state[next_round].copy()  # just copying strings so .copy is fine
         next_bracket_state[next_round].clear()  # clear out the list cause we are going to build it with 64
-        for team_pos_id in enumerate(tournament_info):
+        for team_pos_id in tournament_info:
 
             # check if team is a first four then only append if they won
             if len(team_pos_id) > 3:
@@ -280,18 +280,22 @@ def play_a_game(position_id_team_1: str, melo_1: int, position_id_team_2: str, m
     """
 
     prob_of_team_1 = elo_prob(melo_1, melo_2)
+    random_= random.random()
 
     # DEBUG PRINTS
     print()
     print(f"{position_id_team_1} vs. {position_id_team_2}")
     print(f"{melo_1} vs. {melo_2}")
     print(f"{prob_of_team_1}")
+    print(f"Random : {random_*100}")
     print()
     # DEBUG PRINTS
 
-    random_= random.random()
 
-    if prob_of_team_1 >= random_:
+
+
+
+    if prob_of_team_1 >= random_*100:
         return position_id_team_1
     else:
         return position_id_team_2
