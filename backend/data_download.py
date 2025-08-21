@@ -6,6 +6,7 @@ their success throughout the simulated bracket
 
 """
 import csv
+from platform import system
 
 import pandas   # pip install pandas
 import math     # base python
@@ -141,7 +142,7 @@ def strength_of_schedule_calculator(team: str) -> float:
     game_id_list: list[int] = get_games_as_id_list(team)  # get games the team played in as game-id's
 
     dif = 0  # tracks the difficulty of the opponents based on seed (golf rules)
-    top_64 = 0  # tracks how many top 64 seeds they played
+    top_68 = 0  # tracks how many top 64 seeds they played
 
     for game_id in game_id_list:  # loop through games
         o_as_rec = get_opponent_as_record(team, game_id)  # get opponent
@@ -150,21 +151,23 @@ def strength_of_schedule_calculator(team: str) -> float:
         # Check to see if the opponent is in the top 64
         if opponent in tournament_dataframe['TEAM_NAME'].tolist():
 
-            top_64 = top_64 + 1  # Increment the number of top 64 teams they play
+            top_68 = top_68 + 1  # Increment the number of top 64 teams they play
 
             # get opponents seed
             opp_dif = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]['SEED'].iloc[0]
             dif = dif + opp_dif  # add up the difficulty (golf rules)
 
     # special case if the team never plays a top 64
-    if top_64 == 0:
+    if top_68 == 0:
+        print(f"THIS TEAM NEVER PLAYED A TOP 68 {team}")
+        raise SystemExit(1)
         return 32  # return 32 this puts them outside of any team that plays at least one top 64 team
     else:
-        dif_avg = dif / top_64  # get the average difficulty (golf rules)
+        dif_avg = dif / top_68  # get the average difficulty (golf rules)
 
         # divide the average difficulty by the number of top 64 teams they played
         # this ensures that a team that played a 1, 1 time will have a higher sos than a team that played 1, 2 times.
-        s_o_s = dif_avg / top_64  # divide the average difficulty by the number of top 64 teams they played
+        s_o_s = dif_avg / top_68  # divide the average difficulty by the number of top 64 teams they played
 
         return s_o_s
 
