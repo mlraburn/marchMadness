@@ -144,11 +144,13 @@ def strength_of_schedule_calculator(team: str) -> float:
     dif = 0  # tracks the difficulty of the opponents based on seed (golf rules)
     top_68 = 0  # tracks how many top 64 seeds they played
 
+    opponnent_seed_list_DEBUG = [0] * 16
+
     for game_id in game_id_list:  # loop through games
         o_as_rec = get_opponent_as_record(team, game_id)  # get opponent
         opponent = o_as_rec.iloc[0]['TEAM']  # actually gets the string rather than a data frame of the opponent
 
-        # Check to see if the opponent is in the top 64
+        # Check to see if the opponent is in the top 68
         if opponent in tournament_dataframe['TEAM_NAME'].tolist():
 
             top_68 = top_68 + 1  # Increment the number of top 64 teams they play
@@ -157,19 +159,24 @@ def strength_of_schedule_calculator(team: str) -> float:
             opp_dif = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == opponent]['SEED'].iloc[0]
             dif = dif + opp_dif  # add up the difficulty (golf rules)
 
-    # special case if the team never plays a top 64
-    if top_68 == 0:
-        print(f"THIS TEAM NEVER PLAYED A TOP 68 {team}")
-        raise SystemExit(1)
-        return 32  # return 32 this puts them outside of any team that plays at least one top 64 team
-    else:
-        dif_avg = dif / top_68  # get the average difficulty (golf rules)
+            # debug analysis section
 
-        # divide the average difficulty by the number of top 64 teams they played
-        # this ensures that a team that played a 1, 1 time will have a higher sos than a team that played 1, 2 times.
-        s_o_s = dif_avg / top_68  # divide the average difficulty by the number of top 64 teams they played
+            opponnent_seed_list_DEBUG[opp_dif - 1] += 1  # this will bean count each index for how often they played
+            # a team of seed value
 
-        return s_o_s
+            # end debug analysis section
+
+    dif_avg = dif / top_68  # get the average difficulty (golf rules)
+
+    # divide the average difficulty by the number of top 64 teams they played
+    # this ensures that a team that played a 1, 1 time will have a higher sos than a team that played 1, 2 times.
+    s_o_s = dif_avg / top_68  # divide the average difficulty by the number of top 64 teams they played
+
+    print(f"Team: {team}, sos: {s_o_s}")
+    print(f"Opponents: {opponnent_seed_list_DEBUG}")
+    print()
+
+    return s_o_s
 
 
 def perf_inv(seed: int) -> int:
@@ -484,6 +491,9 @@ def main():
         region = tournament_dataframe[tournament_dataframe['TEAM_NAME'] == team]['REGION'].iloc[0]
 
         win_loss_dif_sos = win_loss_difference_strength_of_schedule(wins, losses, sos)
+        print()
+        print(f"team {team} win_loss_dif_sos {win_loss_dif_sos}")
+        print()
         perf = get_reg_s_perf(team)
 
         print(team)

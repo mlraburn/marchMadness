@@ -89,6 +89,13 @@ def main() -> None:
 
     # END DEBUG BLOCK
 
+    # ANALYSIS BLOCK
+    # WE WANT TO FIGURE OUT THE SIGMOID FUNCTION MATCH BY TEAM
+
+    # create a key map where we store the MELO value for each
+
+    # END ANALYSIS BLOCK
+
 
 
 if __name__ == '__main__':
