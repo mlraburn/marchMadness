@@ -495,6 +495,7 @@ def main():
         print(f"team {team} win_loss_dif_sos {win_loss_dif_sos}")
         print()
         perf = get_reg_s_perf(team)
+        print(f"team {team} perf {perf}")
 
         print(team)
         ns_elo = get_nate_silver_grade(team)
@@ -536,7 +537,7 @@ def main():
 
         weight_windifsos = 0.5
         weight_schedule_performance = 2.5
-        weight_nate_silver = 5.0
+        weight_nate_silver = 4.0
 
         melo = (
             (analysis_dictionary['WINDIFSOS'][i] ** weight_windifsos) *
